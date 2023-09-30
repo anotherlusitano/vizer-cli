@@ -26,7 +26,7 @@ fn main() {
                 .expect("required")
                 .as_str();
 
-            let media_link = search_media(media_name).unwrap();
+            let media_link = search_media(media_name);
 
             watch_media(media_link).unwrap();
         }

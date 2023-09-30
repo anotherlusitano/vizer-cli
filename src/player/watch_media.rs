@@ -2,11 +2,11 @@ use std::{process::Command, thread::sleep, time::Duration};
 
 use thirtyfour::prelude::*;
 
-use crate::cli::choose_lang::choose_lang;
+use crate::{cli::choose_lang::choose_lang, media::Media};
 
 #[tokio::main]
-pub async fn watch_media(video_id: String) -> WebDriverResult<()> {
-    let url = format!("https://vizer.in/{}", video_id);
+pub async fn watch_media(media: Media) -> WebDriverResult<()> {
+    let url = format!("https://vizer.in/{}", &media.link);
 
     let mut chromedriver = Command::new("chromedriver").spawn().unwrap();
     // we need to wait chromedriver to start :(
@@ -20,6 +20,7 @@ pub async fn watch_media(video_id: String) -> WebDriverResult<()> {
     let driver = WebDriver::new("http://localhost:9515", caps).await?;
 
     driver.goto(url).await?;
+
     let langs_table = driver.find(By::ClassName("langs")).await?;
     let langs_items = langs_table.find_all(By::ClassName("item")).await?;
 

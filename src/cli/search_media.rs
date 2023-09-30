@@ -4,7 +4,7 @@ use scraper::{Html, Selector};
 use crate::media::Media;
 
 #[tokio::main]
-pub async fn search_media(media_name: &str) -> Result<String, ()> {
+pub async fn search_media(media_name: &str) -> Media {
     let url = format!("https://vizer.in/pesquisar/{}", media_name);
     let response = reqwest::get(url).await.expect("Could not load url.");
     let html = response.text().await.unwrap();
@@ -36,10 +36,10 @@ pub async fn search_media(media_name: &str) -> Result<String, ()> {
         medias.push(media);
     }
 
-    choose_media(medias)
+    choose_media(medias).unwrap()
 }
 
-fn choose_media(medias: Vec<Media>) -> Result<String, ()> {
+fn choose_media(medias: Vec<Media>) -> Result<Media, ()> {
     let options: Vec<String> = medias
         .iter()
         .enumerate()
@@ -62,9 +62,8 @@ fn choose_media(medias: Vec<Media>) -> Result<String, ()> {
 
             let index: usize = media_index.next().unwrap().parse::<usize>().unwrap();
 
-            let media_link = medias[index - 1].link.clone();
-
-            Ok(media_link)
+            let media = medias[index - 1].clone();
+            Ok(media)
         }
         Err(_) => Err(println!("There was an error, please try again")),
     }
