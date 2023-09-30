@@ -1,5 +1,6 @@
 use core::fmt;
 
+#[derive(Clone)]
 pub struct Media {
     pub title: String,
     pub link: String,
