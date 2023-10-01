@@ -2,7 +2,10 @@ use std::{process::Command, thread::sleep, time::Duration};
 
 use thirtyfour::prelude::*;
 
-use crate::{cli::choose_lang::choose_lang, media::Media};
+use crate::{
+    cli::{choose_episode::choose_episode, choose_lang::choose_lang, choose_season::choose_season},
+    media::Media,
+};
 
 #[tokio::main]
 pub async fn watch_media(media: Media) -> WebDriverResult<()> {
@@ -13,7 +16,7 @@ pub async fn watch_media(media: Media) -> WebDriverResult<()> {
     sleep(Duration::from_millis(100));
 
     clearscreen::clear().unwrap();
-    println!("Getting languages options");
+    println!("Preparing everything, which can take a while");
 
     let mut caps = DesiredCapabilities::chrome();
     caps.set_headless().unwrap();
@@ -21,13 +24,90 @@ pub async fn watch_media(media: Media) -> WebDriverResult<()> {
 
     driver.goto(url).await?;
 
-    let langs_table = driver.find(By::ClassName("langs")).await?;
-    let langs_items = langs_table.find_all(By::ClassName("item")).await?;
+    if media.link.contains("serie/") {
+        let season_items = driver.find_all(By::Css("div[data-season-id]")).await?;
+
+        let mut season_opts: Vec<String> = Vec::new();
+
+        for season in season_items {
+            season_opts.push(season.inner_html().await?);
+        }
+
+        let season_opt = if season_opts.len() > 1 {
+            choose_season(season_opts).unwrap()
+        } else {
+            season_opts[0].to_string()
+        };
+
+        let season_btn_xpath = format!("//div[@data-season-id and text()='{}']", season_opt);
+        let season_element = driver.query(By::XPath(&season_btn_xpath)).first().await?;
+
+        // we execute a js script to not be redirect to other page by the pop up
+        driver
+            .execute(
+                r#"
+            arguments[0].click();
+            "#,
+                vec![season_element.to_json()?],
+            )
+            .await
+            .expect("Error: Can't click on the season");
+
+        println!("Getting episodes");
+
+        let episodes_list = driver.query(By::Id("episodesList")).first().await?;
+        episodes_list.wait_until().displayed().await?;
+
+        let episodes_items = episodes_list
+            .find_all(By::ClassName("bslider-item"))
+            .await?;
+
+        let mut episode_opts: Vec<String> = Vec::new();
+
+        for episode in &episodes_items {
+            episode_opts.push(
+                episode
+                    .find(By::Css("div[slide-number]"))
+                    .await?
+                    .attr("slide-number")
+                    .await?
+                    .unwrap(),
+            );
+        }
+
+        let episode_opt = if episode_opts.len() > 1 {
+            choose_episode(episode_opts).unwrap()
+        } else {
+            episode_opts[0].to_string()
+        };
+
+        let episode_btn_css = format!(r#"div[slide-number="{}"]"#, episode_opt);
+
+        let episode_element = driver.find(By::Css(&episode_btn_css)).await?;
+
+        // we execute a js script to not be redirect to other page by the pop up
+        driver
+            .execute(
+                r#"
+            arguments[0].click();
+            "#,
+                vec![episode_element.to_json()?],
+            )
+            .await
+            .expect("Error: Can't click on the episode");
+    }
+
+    println!("Getting languages options");
+
+    let langs_items = driver
+        .query(By::Css("div[data-load-video-players]"))
+        .all()
+        .await?;
 
     let mut langs_opts: Vec<String> = Vec::new();
 
     for lang in &langs_items {
-        langs_opts.push(lang.text().await?);
+        langs_opts.push(lang.inner_html().await?);
     }
 
     let lang_opt = if langs_opts.len() == 2 {
@@ -40,6 +120,7 @@ pub async fn watch_media(media: Media) -> WebDriverResult<()> {
 
     let lang_element = driver.find(By::XPath(&lang_btn_xpath)).await?;
 
+    // we execute a js script to not be redirect to other page by the pop up
     driver
         .execute(
             r#"
@@ -51,7 +132,7 @@ pub async fn watch_media(media: Media) -> WebDriverResult<()> {
 
     let mut media_id: Option<String> = None;
     for lang in &langs_items {
-        if lang.text().await? == lang_opt {
+        if lang.inner_html().await? == lang_opt {
             media_id = lang.attr("data-load-video-players").await?;
         }
     }
@@ -95,7 +176,7 @@ pub async fn watch_media(media: Media) -> WebDriverResult<()> {
 }
 
 fn open_vlc(video_url: &str) {
-    println!("Starting player");
+    println!("Starting the player");
 
     let output = Command::new("vlc")
         .args(["--fullscreen", "--play-and-exit", video_url])
