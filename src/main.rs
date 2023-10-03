@@ -13,7 +13,7 @@ fn main() {
         .arg_required_else_help(true)
         .subcommand(
             Command::new("search")
-                .about("Search something")
+                .about("Search for your content")
                 .arg(arg!(<SEARCH> "The Search for media").num_args(1..))
                 .arg_required_else_help(true),
         )
