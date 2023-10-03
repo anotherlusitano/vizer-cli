@@ -11,15 +11,15 @@ A cli tool to watch movies/series/animes in portuguese. This tool scrapes the si
 ```
 CLI tool to watch movies/series/animes in portuguese
 
-Usage: vizer-cli <COMMAND>
+Usage: vizer-cli [OPTIONS] <COMMAND>
 
 Commands:
   search, -s  Search for your content
   help        Print this message or the help of the given subcommand(s)
 
 Options:
+  -v, --vim   VIM Mode for the enthusiast
   -h, --help  Print help
-
 ```
 
 ## Dependencies
