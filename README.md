@@ -3,10 +3,24 @@ A cli tool to watch movies/series/animes in portuguese. This tool scrapes the si
 </h3>
 <br>
 
+
 > [!WARNING]  
 > This project is not finished and features are missing!
 
-<br>
+## Usage
+```
+CLI tool to watch movies/series/animes in portuguese
+
+Usage: vizer-cli <COMMAND>
+
+Commands:
+  search  Search for your content
+  help    Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+
+```
 
 ## Dependencies
 
