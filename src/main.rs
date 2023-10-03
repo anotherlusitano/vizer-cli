@@ -14,6 +14,7 @@ fn main() {
         .subcommand(
             Command::new("search")
                 .about("Search for your content")
+                .short_flag('s')
                 .arg(arg!(<SEARCH> "The Search for media").num_args(1..))
                 .arg_required_else_help(true),
         )
