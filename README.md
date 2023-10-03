@@ -14,8 +14,8 @@ CLI tool to watch movies/series/animes in portuguese
 Usage: vizer-cli <COMMAND>
 
 Commands:
-  search  Search for your content
-  help    Print this message or the help of the given subcommand(s)
+  search, -s  Search for your content
+  help        Print this message or the help of the given subcommand(s)
 
 Options:
   -h, --help  Print help
