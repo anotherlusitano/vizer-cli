@@ -4,7 +4,7 @@ use scraper::{Html, Selector};
 use crate::media::Media;
 
 #[tokio::main]
-pub async fn search_media(media_name: &str) -> Media {
+pub async fn search_media(media_name: &str) -> Result<Media, String> {
     let url = format!("https://vizer.in/pesquisar/{}", media_name);
     let response = reqwest::get(url).await.expect("Could not load url.");
     let html = response.text().await.unwrap();
@@ -36,7 +36,10 @@ pub async fn search_media(media_name: &str) -> Media {
         medias.push(media);
     }
 
-    choose_media(medias).unwrap()
+    match medias.is_empty() {
+        true => Err("Couldn't find anything with your query".to_string()),
+        false => Ok(choose_media(medias).unwrap()),
+    }
 }
 
 fn choose_media(medias: Vec<Media>) -> Result<Media, ()> {

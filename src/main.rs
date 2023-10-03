@@ -26,9 +26,14 @@ fn main() {
                 .expect("required")
                 .as_str();
 
-            let media_link = search_media(media_name);
-
-            watch_media(media_link).unwrap();
+            match search_media(media_name) {
+                Ok(media_link) => {
+                    watch_media(media_link).unwrap();
+                }
+                Err(err) => {
+                    eprintln!("{}", err);
+                }
+            }
         }
         _ => println!("No Choice?"),
     }
