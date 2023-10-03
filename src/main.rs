@@ -27,6 +27,11 @@ fn main() {
                 .map(|v| v.as_str())
                 .collect::<String>();
 
+            if media_name.len() < 4 {
+                // because the site only allows us to search more than 3 characters
+                panic!("Sorry, your query needs to be at least 4 characters")
+            }
+
             match search_media(&media_name) {
                 Ok(media_link) => {
                     watch_media(media_link).unwrap();
