@@ -1,7 +1,7 @@
 use inquire::{InquireError, Select};
 use scraper::{Html, Selector};
 
-use crate::media::Media;
+use crate::{media::Media, VIM_MODE};
 
 #[tokio::main]
 pub async fn search_media(media_name: &str) -> Result<Media, String> {
@@ -56,7 +56,7 @@ fn choose_media(medias: Vec<Media>) -> Result<Media, ()> {
         Select::new("Select what you want to watch:", vec_str.clone())
             .without_help_message()
             .with_page_size(options.len())
-            .with_vim_mode(true)
+            .with_vim_mode(unsafe { VIM_MODE })
             .prompt();
 
     match ans {
