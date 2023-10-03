@@ -14,7 +14,7 @@ fn main() {
         .subcommand(
             Command::new("search")
                 .about("Search something")
-                .arg(arg!(<SEARCH> "The Search for media"))
+                .arg(arg!(<SEARCH> "The Search for media").num_args(1..))
                 .arg_required_else_help(true),
         )
         .get_matches();
@@ -22,11 +22,12 @@ fn main() {
     match matches.subcommand() {
         Some(("search", sub_matches)) => {
             let media_name = sub_matches
-                .get_one::<String>("SEARCH")
+                .get_many::<String>("SEARCH")
                 .expect("required")
-                .as_str();
+                .map(|v| v.as_str())
+                .collect::<String>();
 
-            match search_media(media_name) {
+            match search_media(&media_name) {
                 Ok(media_link) => {
                     watch_media(media_link).unwrap();
                 }
