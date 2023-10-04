@@ -75,8 +75,13 @@ pub async fn watch_media(media: Media) -> WebDriverResult<()> {
             );
         }
 
-        let episode_opt = if episode_opts.len() > 1 {
-            choose_episode(episode_opts).unwrap()
+        let episode_opt: String = if episode_opts.len() > 1 {
+            (choose_episode(episode_opts)
+                .unwrap()
+                .parse::<u32>()
+                .unwrap()
+                - 1)
+            .to_string()
         } else {
             episode_opts[0].to_string()
         };
