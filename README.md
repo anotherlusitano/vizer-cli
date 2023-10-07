@@ -5,7 +5,7 @@ A cli tool to watch movies/series/animes in portuguese. This tool scrapes the si
 
 
 > [!WARNING]  
-> This project is not finished and features are missing!
+> This project is not finished. Don't have any high expectations.
 
 ## Usage
 ```
