@@ -1,5 +1,6 @@
 use crate::cli::search_media::get_medias;
 use clap::{arg, Arg, Command};
+use cli::choose_media::choose_media;
 use player::watch_media::watch_media;
 
 mod cli;
@@ -48,12 +49,18 @@ fn main() {
                 panic!("Sorry, your query needs to be at least 4 characters")
             }
 
-            match get_medias(&media_name) {
+            let media = get_medias(&media_name);
+
+            if media.is_empty() {
+                panic!("Couldn't find anything with your query")
+            }
+
+            match choose_media(media) {
                 Ok(media_link) => {
                     watch_media(media_link).unwrap();
                 }
                 Err(err) => {
-                    eprintln!("{}", err);
+                    eprintln!("{:?}", err);
                 }
             }
         }

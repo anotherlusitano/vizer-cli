@@ -1,10 +1,9 @@
-use inquire::{InquireError, Select};
 use scraper::{Html, Selector};
 
-use crate::{media::Media, VIM_MODE};
+use crate::media::Media;
 
 #[tokio::main]
-pub async fn get_medias(media_name: &str) -> Result<Media, String> {
+pub async fn get_medias(media_name: &str) -> Vec<Media> {
     let url = format!("https://vizer.in/pesquisar/{}", media_name);
     let response = reqwest::get(url).await.expect("Could not load url.");
     let html = response.text().await.unwrap();
@@ -36,40 +35,5 @@ pub async fn get_medias(media_name: &str) -> Result<Media, String> {
         medias.push(media);
     }
 
-    match medias.is_empty() {
-        true => Err("Couldn't find anything with your query".to_string()),
-        false => Ok(choose_media(medias).unwrap()),
-    }
-}
-
-fn choose_media(medias: Vec<Media>) -> Result<Media, ()> {
-    let options: Vec<String> = medias
-        .iter()
-        .enumerate()
-        .map(|(index, item)| format!("{} {}", index + 1, item.title))
-        .collect();
-
-    let vec_str: Vec<&str> = options.iter().map(|s| s.as_str()).collect();
-
-    let help_msg = format!("Total of media to watch: {}", vec_str.len());
-
-    clearscreen::clear().unwrap();
-    let ans: Result<&str, InquireError> =
-        Select::new("Select what you want to watch:", vec_str.clone())
-            .with_help_message(&help_msg)
-            .with_page_size(25)
-            .with_vim_mode(unsafe { VIM_MODE })
-            .prompt();
-
-    match ans {
-        Ok(choice) => {
-            let mut media_index = choice.split_whitespace();
-
-            let index: usize = media_index.next().unwrap().parse::<usize>().unwrap();
-
-            let media = medias[index - 1].clone();
-            Ok(media)
-        }
-        Err(_) => Err(println!("There was an error, please try again")),
-    }
+    medias
 }
