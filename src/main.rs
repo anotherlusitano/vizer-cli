@@ -1,4 +1,4 @@
-use crate::cli::search_media::get_medias;
+use crate::cli::get_medias::get_medias;
 use clap::{arg, Arg, Command};
 use cli::choose_media::choose_media;
 use player::watch_media::watch_media;
