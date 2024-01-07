@@ -4,7 +4,7 @@ use scraper::{Html, Selector};
 use crate::{media::Media, VIM_MODE};
 
 #[tokio::main]
-pub async fn search_media(media_name: &str) -> Result<Media, String> {
+pub async fn get_medias(media_name: &str) -> Result<Media, String> {
     let url = format!("https://vizer.in/pesquisar/{}", media_name);
     let response = reqwest::get(url).await.expect("Could not load url.");
     let html = response.text().await.unwrap();

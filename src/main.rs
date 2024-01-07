@@ -1,4 +1,4 @@
-use crate::cli::search_media::search_media;
+use crate::cli::search_media::get_medias;
 use clap::{arg, Arg, Command};
 use player::watch_media::watch_media;
 
@@ -48,7 +48,7 @@ fn main() {
                 panic!("Sorry, your query needs to be at least 4 characters")
             }
 
-            match search_media(&media_name) {
+            match get_medias(&media_name) {
                 Ok(media_link) => {
                     watch_media(media_link).unwrap();
                 }
