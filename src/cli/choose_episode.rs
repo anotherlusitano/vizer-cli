@@ -3,7 +3,7 @@ use inquire::{InquireError, Select};
 use crate::VIM_MODE;
 
 pub fn choose_episode(mut episodes: Vec<String>) -> Result<String, ()> {
-    clearscreen::clear().unwrap();
+    print!("\x1B[2J\x1B[1;1H");
 
     let help_msg = format!("Total of episodes to watch: {}", episodes.len());
 

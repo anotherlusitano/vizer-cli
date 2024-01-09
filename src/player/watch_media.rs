@@ -16,7 +16,7 @@ pub async fn watch_media(media: Media) -> WebDriverResult<()> {
     // we need to wait chromedriver to start :(
     sleep(Duration::from_millis(100));
 
-    clearscreen::clear().unwrap();
+    print!("\x1B[2J\x1B[1;1H");
     println!("Preparing everything, which can take a while");
 
     let mut caps = DesiredCapabilities::chrome();

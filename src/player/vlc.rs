@@ -11,7 +11,7 @@ pub fn open_vlc(video_url: &str) {
         Ok(mut child) => match child.wait() {
             Ok(status) => {
                 if status.success() {
-                    clearscreen::clear().unwrap();
+                    print!("\x1B[2J\x1B[1;1H");
                     println!("VLC exited successfully");
                 } else {
                     println!("VLC exited with an error: {:?}", status.code());

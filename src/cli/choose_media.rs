@@ -13,7 +13,7 @@ pub fn choose_media(medias: Vec<Media>) -> Result<Media, ()> {
 
     let help_msg = format!("Total of media to watch: {}", vec_str.len());
 
-    clearscreen::clear().unwrap();
+    print!("\x1B[2J\x1B[1;1H");
     let ans: Result<&str, InquireError> =
         Select::new("Select what you want to watch:", vec_str.clone())
             .with_help_message(&help_msg)
