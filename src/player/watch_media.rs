@@ -105,41 +105,28 @@ pub async fn watch_media(media: Media) -> WebDriverResult<()> {
 
     println!("Getting languages options");
 
-    let langs_items = driver
-        .query(By::Css("div[data-load-video-players]"))
-        .all()
-        .await?;
+    let langs_items = driver.query(By::Css("div[data-audio]")).all().await?;
 
     let mut langs_opts: Vec<String> = Vec::new();
 
     for lang in &langs_items {
-        langs_opts.push(lang.inner_html().await?);
+        let opt = lang
+            .attr("data-audio")
+            .await?
+            .expect("Couldn't retrieve languages options.");
+        langs_opts.push(opt);
     }
 
     let lang_opt = if langs_opts.len() == 2 {
-        choose_lang(langs_opts).unwrap()
+        choose_lang(langs_opts.clone()).unwrap()
     } else {
         langs_opts[0].to_string()
     };
 
-    let lang_btn_xpath = format!("//div[text()='{}']", lang_opt);
-
-    let lang_element = driver.find(By::XPath(&lang_btn_xpath)).await?;
-
-    // we execute a js script to not be redirect to other page by the pop up
-    driver
-        .execute(
-            r#"
-            arguments[0].click();
-            "#,
-            vec![lang_element.to_json()?],
-        )
-        .await?;
-
     let mut media_id: Option<String> = None;
-    for lang in &langs_items {
-        if lang.inner_html().await? == lang_opt {
-            media_id = lang.attr("data-load-video-players").await?;
+    for i in 0..langs_opts.len() {
+        if langs_opts[i] == lang_opt {
+            media_id = langs_items[i].attr("data-load-player").await?;
         }
     }
 
