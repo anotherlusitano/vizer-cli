@@ -40,7 +40,7 @@ pub async fn watch_media(media: Media) -> WebDriverResult<()> {
             season_opts[0].to_string()
         };
 
-        let season_btn_xpath = format!("//div[@data-season-id and text()='{}']", season_opt);
+        let season_btn_xpath = format!("//div[text()='{}']", season_opt);
         let season_element = driver.query(By::XPath(&season_btn_xpath)).first().await?;
 
         // we execute a js script to not be redirect to other page by the pop up
@@ -56,40 +56,29 @@ pub async fn watch_media(media: Media) -> WebDriverResult<()> {
 
         println!("Getting episodes");
 
-        let episodes_list = driver.query(By::Id("episodesList")).first().await?;
-        episodes_list.wait_until().displayed().await?;
+        let episodes_list = driver.find(By::ClassName("episodes")).await?;
 
-        let episodes_items = episodes_list
-            .find_all(By::ClassName("bslider-item"))
-            .await?;
+        let episodes_items = episodes_list.query(By::ClassName("item")).all().await?;
 
         let mut episode_opts: Vec<String> = Vec::new();
 
-        for episode in &episodes_items {
-            episode_opts.push(
-                episode
-                    .find(By::Css("div[slide-number]"))
-                    .await?
-                    .attr("slide-number")
-                    .await?
-                    .unwrap(),
-            );
+        for (i, item) in episodes_items.iter().enumerate() {
+            if item.class_name().await?.unwrap() != "item unreleased " {
+                // this thing of adding by 1
+                // is just to show the episodes starting in 1
+                episode_opts.push((i + 1).to_string());
+            }
         }
 
-        let episode_opt: String = if episode_opts.len() > 1 {
-            (choose_episode(episode_opts)
+        let episode_opt: usize = if episode_opts.len() > 1 {
+            choose_episode(episode_opts)
                 .unwrap()
-                .parse::<u32>()
+                .parse::<usize>()
                 .unwrap()
-                - 1)
-            .to_string()
+                - 1
         } else {
-            episode_opts[0].to_string()
+            episode_opts[0].parse::<usize>().unwrap() - 1
         };
-
-        let episode_btn_css = format!(r#"div[slide-number="{}"]"#, episode_opt);
-
-        let episode_element = driver.find(By::Css(&episode_btn_css)).await?;
 
         // we execute a js script to not be redirect to other page by the pop up
         driver
@@ -97,7 +86,7 @@ pub async fn watch_media(media: Media) -> WebDriverResult<()> {
                 r#"
             arguments[0].click();
             "#,
-                vec![episode_element.to_json()?],
+                vec![episodes_items[episode_opt].to_json()?],
             )
             .await
             .expect("Error: Can't click on the episode");
@@ -105,41 +94,28 @@ pub async fn watch_media(media: Media) -> WebDriverResult<()> {
 
     println!("Getting languages options");
 
-    let langs_items = driver
-        .query(By::Css("div[data-load-video-players]"))
-        .all()
-        .await?;
+    let langs_items = driver.query(By::Css("div[data-audio]")).all().await?;
 
     let mut langs_opts: Vec<String> = Vec::new();
 
     for lang in &langs_items {
-        langs_opts.push(lang.inner_html().await?);
+        let opt = lang
+            .attr("data-audio")
+            .await?
+            .expect("Couldn't retrieve languages options.");
+        langs_opts.push(opt);
     }
 
     let lang_opt = if langs_opts.len() == 2 {
-        choose_lang(langs_opts).unwrap()
+        choose_lang(langs_opts.clone()).unwrap()
     } else {
         langs_opts[0].to_string()
     };
 
-    let lang_btn_xpath = format!("//div[text()='{}']", lang_opt);
-
-    let lang_element = driver.find(By::XPath(&lang_btn_xpath)).await?;
-
-    // we execute a js script to not be redirect to other page by the pop up
-    driver
-        .execute(
-            r#"
-            arguments[0].click();
-            "#,
-            vec![lang_element.to_json()?],
-        )
-        .await?;
-
     let mut media_id: Option<String> = None;
-    for lang in &langs_items {
-        if lang.inner_html().await? == lang_opt {
-            media_id = lang.attr("data-load-video-players").await?;
+    for i in 0..langs_opts.len() {
+        if langs_opts[i] == lang_opt {
+            media_id = langs_items[i].attr("data-load-player").await?;
         }
     }
 
