@@ -40,7 +40,7 @@ pub async fn watch_media(media: Media) -> WebDriverResult<()> {
             season_opts[0].to_string()
         };
 
-        let season_btn_xpath = format!("//div[@data-season-id and text()='{}']", season_opt);
+        let season_btn_xpath = format!("//div[text()='{}']", season_opt);
         let season_element = driver.query(By::XPath(&season_btn_xpath)).first().await?;
 
         // we execute a js script to not be redirect to other page by the pop up
@@ -56,40 +56,27 @@ pub async fn watch_media(media: Media) -> WebDriverResult<()> {
 
         println!("Getting episodes");
 
-        let episodes_list = driver.query(By::Id("episodesList")).first().await?;
-        episodes_list.wait_until().displayed().await?;
+        let episodes_list = driver.find(By::ClassName("episodes")).await?;
 
-        let episodes_items = episodes_list
-            .find_all(By::ClassName("bslider-item"))
-            .await?;
+        let episodes_items = episodes_list.query(By::ClassName("item")).all().await?;
 
         let mut episode_opts: Vec<String> = Vec::new();
 
-        for episode in &episodes_items {
-            episode_opts.push(
-                episode
-                    .find(By::Css("div[slide-number]"))
-                    .await?
-                    .attr("slide-number")
-                    .await?
-                    .unwrap(),
-            );
+        for i in 0..episodes_items.len() {
+            // this thing of adding by 1
+            // is just to show the episodes starting in 1
+            episode_opts.push((i + 1).to_string());
         }
 
-        let episode_opt: String = if episode_opts.len() > 1 {
-            (choose_episode(episode_opts)
+        let episode_opt: usize = if episode_opts.len() > 1 {
+            choose_episode(episode_opts)
                 .unwrap()
-                .parse::<u32>()
+                .parse::<usize>()
                 .unwrap()
-                - 1)
-            .to_string()
+                - 1
         } else {
-            episode_opts[0].to_string()
+            episode_opts[0].parse::<usize>().unwrap() - 1
         };
-
-        let episode_btn_css = format!(r#"div[slide-number="{}"]"#, episode_opt);
-
-        let episode_element = driver.find(By::Css(&episode_btn_css)).await?;
 
         // we execute a js script to not be redirect to other page by the pop up
         driver
@@ -97,7 +84,7 @@ pub async fn watch_media(media: Media) -> WebDriverResult<()> {
                 r#"
             arguments[0].click();
             "#,
-                vec![episode_element.to_json()?],
+                vec![episodes_items[episode_opt].to_json()?],
             )
             .await
             .expect("Error: Can't click on the episode");
