@@ -62,10 +62,12 @@ pub async fn watch_media(media: Media) -> WebDriverResult<()> {
 
         let mut episode_opts: Vec<String> = Vec::new();
 
-        for i in 0..episodes_items.len() {
-            // this thing of adding by 1
-            // is just to show the episodes starting in 1
-            episode_opts.push((i + 1).to_string());
+        for (i, item) in episodes_items.iter().enumerate() {
+            if item.class_name().await?.unwrap() != "item unreleased " {
+                // this thing of adding by 1
+                // is just to show the episodes starting in 1
+                episode_opts.push((i + 1).to_string());
+            }
         }
 
         let episode_opt: usize = if episode_opts.len() > 1 {
