@@ -1,9 +1,13 @@
-use crate::cli::get_medias::get_medias;
+use crate::{
+    cli::get_medias::get_medias,
+    fs::temp_dir::{create_temp_dir, remove_temp_dir},
+};
 use clap::{arg, Arg, Command};
 use cli::choose_media::choose_media;
 use player::watch_media::watch_media;
 
 mod cli;
+mod fs;
 pub mod media;
 mod player;
 
@@ -68,6 +72,7 @@ fn main() {
             }
 
             if img_mode {
+                create_temp_dir();
                 todo!();
             }
 
@@ -78,6 +83,9 @@ fn main() {
                 Err(err) => {
                     eprintln!("{:?}", err);
                 }
+            }
+            if img_mode {
+                remove_temp_dir();
             }
         }
         _ => println!("No Choice?"),
