@@ -4,7 +4,9 @@ use crate::{
 };
 use clap::{arg, Arg, Command};
 use cli::choose_media::choose_media;
+use fs::posters::get_posters_path;
 use player::watch_media::watch_media;
+use tokio::runtime::Runtime;
 
 mod cli;
 mod fs;
@@ -71,9 +73,12 @@ fn main() {
                 panic!("Couldn't find anything with your query")
             }
 
+            let mut posters_path = Vec::new();
             if img_mode {
                 create_temp_dir();
-                todo!();
+                let rt = Runtime::new().unwrap();
+                let future = get_posters_path(media.clone());
+                posters_path = rt.block_on(future).unwrap();
             }
 
             match choose_media(media) {
