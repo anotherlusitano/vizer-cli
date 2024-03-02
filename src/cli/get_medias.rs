@@ -25,11 +25,11 @@ pub async fn get_medias(media_name: &str) -> Vec<Media> {
             .replace("Assistir ", "")
             .replace(" online", "");
 
-        let media_link = poster.value().attr("href").unwrap();
+        let media_url = poster.value().attr("href").unwrap();
 
         let media = Media {
             title: media_title,
-            link: media_link.to_string(),
+            url: media_url.to_string(),
         };
 
         medias.push(media);

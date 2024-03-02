@@ -10,7 +10,7 @@ use crate::{
 
 #[tokio::main]
 pub async fn watch_media(media: Media) -> WebDriverResult<()> {
-    let url = format!("https://vizer.in/{}", &media.link);
+    let url = format!("https://vizer.in/{}", &media.url);
 
     let mut chromedriver = Command::new("chromedriver").spawn().unwrap();
     // we need to wait chromedriver to start :(
@@ -25,7 +25,7 @@ pub async fn watch_media(media: Media) -> WebDriverResult<()> {
 
     driver.goto(url).await?;
 
-    if media.link.contains("serie/") {
+    if media.url.contains("serie/") {
         let season_items = driver.find_all(By::Css("div[data-season-id]")).await?;
 
         let mut season_opts: Vec<String> = Vec::new();
