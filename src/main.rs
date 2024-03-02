@@ -23,6 +23,15 @@ fn main() {
                 .help("VIM Mode for the enthusiast")
                 .action(clap::ArgAction::SetTrue),
         )
+        .arg(
+            Arg::new("img")
+                .short('i')
+                .long("img")
+                .required(false)
+                .num_args(0)
+                .help("Enable you to see the posters as you choose them")
+                .action(clap::ArgAction::SetTrue),
+        )
         .subcommand(
             Command::new("search")
                 .about("Search for your content")
@@ -32,8 +41,11 @@ fn main() {
         )
         .get_matches();
 
+    let mut img_mode = false;
     if matches.get_flag("vim") {
         unsafe { VIM_MODE = true };
+    } else if matches.get_flag("img") {
+        img_mode = true;
     }
 
     match matches.subcommand() {
@@ -53,6 +65,10 @@ fn main() {
 
             if media.is_empty() {
                 panic!("Couldn't find anything with your query")
+            }
+
+            if img_mode {
+                todo!();
             }
 
             match choose_media(media) {
