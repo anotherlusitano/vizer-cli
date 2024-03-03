@@ -3,7 +3,7 @@ use crate::{
     fs::temp_dir::{create_temp_dir, remove_temp_dir},
 };
 use clap::{arg, Arg, Command};
-use cli::choose_media::choose_media;
+use cli::{choose_media::choose_media, choose_medias_with_images::choose_med};
 use fs::posters::get_posters_path;
 use player::watch_media::watch_media;
 use tokio::runtime::Runtime;
@@ -73,24 +73,30 @@ fn main() {
                 panic!("Couldn't find anything with your query")
             }
 
-            let mut posters_path = Vec::new();
             if img_mode {
                 create_temp_dir();
                 let rt = Runtime::new().unwrap();
                 let future = get_posters_path(media.clone());
-                posters_path = rt.block_on(future).unwrap();
-            }
-
-            match choose_media(media) {
-                Ok(media_link) => {
-                    watch_media(media_link).unwrap();
+                let posters_path = rt.block_on(future).unwrap();
+                match choose_med(media.clone(), posters_path) {
+                    Ok(media_link) => {
+                        remove_temp_dir();
+                        watch_media(media_link).unwrap();
+                    }
+                    Err(err) => {
+                        remove_temp_dir();
+                        eprintln!("{:?}", err);
+                    }
                 }
-                Err(err) => {
-                    eprintln!("{:?}", err);
+            } else {
+                match choose_media(media) {
+                    Ok(media_link) => {
+                        watch_media(media_link).unwrap();
+                    }
+                    Err(err) => {
+                        eprintln!("{:?}", err);
+                    }
                 }
-            }
-            if img_mode {
-                remove_temp_dir();
             }
         }
         _ => println!("No Choice?"),
