@@ -3,7 +3,7 @@ use crate::{
     fs::temp_dir::{create_temp_dir, remove_temp_dir},
 };
 use clap::{arg, Arg, Command};
-use cli::{choose_media::choose_media, choose_medias_with_images::choose_med};
+use cli::{choose_media::choose_media, choose_medias_with_images::choose_media_with_images};
 use fs::posters::get_posters_path;
 use player::watch_media::watch_media;
 use tokio::runtime::Runtime;
@@ -78,7 +78,7 @@ fn main() {
                 let rt = Runtime::new().unwrap();
                 let future = get_posters_path(media.clone());
                 let posters_path = rt.block_on(future).unwrap();
-                match choose_med(media.clone(), posters_path) {
+                match choose_media_with_images(media.clone(), posters_path) {
                     Ok(media_link) => {
                         remove_temp_dir();
                         watch_media(media_link).unwrap();

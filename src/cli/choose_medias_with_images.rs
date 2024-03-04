@@ -15,7 +15,7 @@ use crate::media::Media;
 const MAX_OPTIONS: usize = 25;
 const COLOR: Color = Color::Yellow;
 
-pub fn choose_med(medias: Vec<Media>, imgs_path: Vec<String>) -> Result<Media, ()> {
+pub fn choose_media_with_images(medias: Vec<Media>, imgs_path: Vec<String>) -> Result<Media, ()> {
     let mut stdout = stdout();
     let mut last_option = min(MAX_OPTIONS, medias.len());
     let mut first_option = 0;
