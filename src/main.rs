@@ -32,7 +32,7 @@ fn main() {
         .arg(
             Arg::new("img")
                 .short('i')
-                .long("img")
+                .long("image-preview")
                 .required(false)
                 .num_args(0)
                 .help("Enable you to see the posters as you choose them")
