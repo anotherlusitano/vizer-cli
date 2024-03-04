@@ -1,9 +1,15 @@
-use crate::cli::get_medias::get_medias;
+use crate::{
+    cli::get_medias::get_medias,
+    fs::temp_dir::{create_temp_dir, remove_temp_dir},
+};
 use clap::{arg, Arg, Command};
-use cli::choose_media::choose_media;
+use cli::{choose_media::choose_media, choose_medias_with_images::choose_media_with_images};
+use fs::posters::get_posters_path;
 use player::watch_media::watch_media;
+use tokio::runtime::Runtime;
 
 mod cli;
+mod fs;
 pub mod media;
 mod player;
 
@@ -23,6 +29,15 @@ fn main() {
                 .help("VIM Mode for the enthusiast")
                 .action(clap::ArgAction::SetTrue),
         )
+        .arg(
+            Arg::new("img")
+                .short('i')
+                .long("image-preview")
+                .required(false)
+                .num_args(0)
+                .help("Enable you to see the posters as you choose them")
+                .action(clap::ArgAction::SetTrue),
+        )
         .subcommand(
             Command::new("search")
                 .about("Search for your content")
@@ -32,8 +47,11 @@ fn main() {
         )
         .get_matches();
 
+    let mut img_mode = false;
     if matches.get_flag("vim") {
         unsafe { VIM_MODE = true };
+    } else if matches.get_flag("img") {
+        img_mode = true;
     }
 
     match matches.subcommand() {
@@ -55,12 +73,29 @@ fn main() {
                 panic!("Couldn't find anything with your query")
             }
 
-            match choose_media(media) {
-                Ok(media_link) => {
-                    watch_media(media_link).unwrap();
+            if img_mode {
+                create_temp_dir();
+                let rt = Runtime::new().unwrap();
+                let future = get_posters_path(media.clone());
+                let posters_path = rt.block_on(future).unwrap();
+                match choose_media_with_images(media.clone(), posters_path) {
+                    Ok(media_link) => {
+                        remove_temp_dir();
+                        watch_media(media_link).unwrap();
+                    }
+                    Err(err) => {
+                        remove_temp_dir();
+                        eprintln!("{:?}", err);
+                    }
                 }
-                Err(err) => {
-                    eprintln!("{:?}", err);
+            } else {
+                match choose_media(media) {
+                    Ok(media_link) => {
+                        watch_media(media_link).unwrap();
+                    }
+                    Err(err) => {
+                        eprintln!("{:?}", err);
+                    }
                 }
             }
         }
