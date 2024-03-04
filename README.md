@@ -18,7 +18,8 @@ Commands:
   help        Print this message or the help of the given subcommand(s)
 
 Options:
-  -v, --vim   VIM Mode for the enthusiast
+  -v, --vim   VIM Mode for the enthusiast (only works without the image preview)
+  -i, --image-preview  Enable you to see the posters as you choose them
   -h, --help  Print help
 ```
 
