@@ -78,11 +78,16 @@ fn main() {
                 let rt = Runtime::new().unwrap();
                 let future = get_posters_path(medias.clone());
                 let posters_path = rt.block_on(future).unwrap();
+                let medias_title: Vec<String> = medias
+                    .clone()
+                    .into_iter()
+                    .map(|media| media.title)
+                    .collect();
 
-                match choose_media_with_images(medias.clone(), posters_path) {
-                    Ok(media_link) => {
+                match choose_media_with_images(&medias_title, posters_path) {
+                    Ok(media_index) => {
                         remove_temp_dir();
-                        watch_media(media_link).unwrap();
+                        watch_media(medias[media_index].clone()).unwrap();
                     }
                     Err(err) => {
                         remove_temp_dir();
@@ -91,8 +96,8 @@ fn main() {
                 }
             } else {
                 match choose_media(medias) {
-                    Ok(media_link) => {
-                        watch_media(media_link).unwrap();
+                    Ok(media) => {
+                        watch_media(media).unwrap();
                     }
                     Err(err) => {
                         eprintln!("{:?}", err);
