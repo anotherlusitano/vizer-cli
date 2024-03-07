@@ -75,6 +75,8 @@ fn main() {
                 panic!("Couldn't find anything with your query")
             }
 
+            set_inquire_style();
+
             if img_mode {
                 create_temp_dir();
                 let medias_poster_url: Vec<String> = medias
@@ -103,7 +105,6 @@ fn main() {
                     }
                 }
             } else {
-                set_inquire_style();
                 match choose_media(medias) {
                     Ok(media) => {
                         watch_media(media, Some(img_mode)).unwrap();
