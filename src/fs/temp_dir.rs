@@ -1,12 +1,16 @@
 use std::{
     env,
+    path::Path,
     fs::{create_dir, remove_dir_all},
 };
 
 pub fn create_temp_dir() {
     let tmp = env::temp_dir();
     let vizer_temp = format!("{}/vizer", tmp.display());
-    create_dir(vizer_temp).expect("Couldn't create the temporary directory!");
+    if !Path::new(&vizer_temp).exists()
+    {
+        create_dir(vizer_temp).expect("Couldn't create the temporary directory!");
+    }
 }
 
 pub fn remove_temp_dir() {
