@@ -3,13 +3,17 @@ use std::{process::Command, thread::sleep, time::Duration};
 use thirtyfour::prelude::*;
 
 use crate::{
-    cli::{choose_episode::choose_episode, choose_lang::choose_lang, choose_season::choose_season},
+    cli::{
+        choose_episode::choose_episode, choose_lang::choose_lang, choose_season::choose_season,
+        choose_with_images::choose_with_images,
+    },
+    fs::posters::get_posters_path,
     media::Media,
     player::vlc::open_vlc,
 };
 
 #[tokio::main]
-pub async fn watch_media(media: Media) -> WebDriverResult<()> {
+pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResult<()> {
     let url = format!("https://vizer.in/{}", &media.url);
 
     let mut chromedriver = Command::new("chromedriver").spawn().unwrap();
@@ -60,7 +64,8 @@ pub async fn watch_media(media: Media) -> WebDriverResult<()> {
 
         let episodes_items = episodes_list.query(By::ClassName("item")).all().await?;
 
-        let mut episode_opts: Vec<String> = Vec::new();
+        let mut episodes_opt: Vec<String> = Vec::new();
+        let mut episodes_img_url: Vec<String> = Vec::new();
 
         for (i, item) in episodes_items.iter().enumerate() {
             if item.class_name().await?.unwrap() != "item unreleased " {
@@ -70,14 +75,28 @@ pub async fn watch_media(media: Media) -> WebDriverResult<()> {
                 // is just to show the episodes starting in 1
                 let episode: String = format!("{} - {}", i + 1, episode_text);
 
-                episode_opts.push(episode);
+                episodes_opt.push(episode);
+
+                if img_mode.unwrap() {
+                    let img_src = item.find(By::Tag("img")).await?.attr("src").await?.unwrap();
+                    let img_url =
+                        format!("https://vizertv.in{}", img_src.replace("s/185", "s/500"));
+                    episodes_img_url.push(img_url);
+                }
             }
         }
 
-        let episode_opt: usize = if episode_opts.len() > 1 {
-            choose_episode(episode_opts).unwrap()
+        let episode_opt: usize = if episodes_opt.len() > 1 {
+            match img_mode {
+                Some(true) => {
+                    let posters_path = get_posters_path(episodes_img_url).await.unwrap();
+
+                    choose_with_images(&episodes_opt, posters_path).unwrap()
+                }
+                _ => choose_episode(episodes_opt).unwrap(),
+            }
         } else {
-            episode_opts[0].parse::<usize>().unwrap() - 1
+            episodes_opt[0].parse::<usize>().unwrap() - 1
         };
 
         // we execute a js script to not be redirect to other page by the pop up
