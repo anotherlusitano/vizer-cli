@@ -64,18 +64,18 @@ pub async fn watch_media(media: Media) -> WebDriverResult<()> {
 
         for (i, item) in episodes_items.iter().enumerate() {
             if item.class_name().await?.unwrap() != "item unreleased " {
+                let episode_text = item.find(By::Tag("span")).await?.inner_html().await?;
+
                 // this thing of adding by 1
                 // is just to show the episodes starting in 1
-                episode_opts.push((i + 1).to_string());
+                let episode: String = format!("{} - {}", i + 1, episode_text);
+
+                episode_opts.push(episode);
             }
         }
 
         let episode_opt: usize = if episode_opts.len() > 1 {
-            choose_episode(episode_opts)
-                .unwrap()
-                .parse::<usize>()
-                .unwrap()
-                - 1
+            choose_episode(episode_opts).unwrap()
         } else {
             episode_opts[0].parse::<usize>().unwrap() - 1
         };

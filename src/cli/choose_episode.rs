@@ -2,7 +2,7 @@ use inquire::{InquireError, Select};
 
 use crate::VIM_MODE;
 
-pub fn choose_episode(episodes: Vec<String>) -> Result<String, ()> {
+pub fn choose_episode(episodes: Vec<String>) -> Result<usize, ()> {
     print!("\x1B[2J\x1B[1;1H");
 
     let help_msg = format!("Total of episodes to watch: {}", episodes.len());
@@ -15,7 +15,13 @@ pub fn choose_episode(episodes: Vec<String>) -> Result<String, ()> {
             .prompt();
 
     match ans {
-        Ok(choice) => Ok(choice),
+        Ok(choice) => {
+            let mut episode_number = choice.split_whitespace();
+
+            let episode: usize = episode_number.next().unwrap().parse::<usize>().unwrap() - 1;
+
+            Ok(episode)
+        }
         Err(_) => Err(println!("There was an error, please try again")),
     }
 }
