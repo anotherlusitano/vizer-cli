@@ -217,7 +217,7 @@ fn write_options(
     stdout.queue(Clear(ClearType::All)).unwrap();
 
     for option in &options[first_option..last_option] {
-        let selected_option = format!(">  {}", option);
+        let selected_option = format!("> {}", option);
         let unselected_option = format!("  {}", option);
         if row == cursor_pos {
             stdout.queue(SetForegroundColor(COLOR)).unwrap();
