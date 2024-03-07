@@ -12,7 +12,7 @@ pub fn open_vlc(video_url: &str) {
             Ok(status) => {
                 if status.success() {
                     print!("\x1B[2J\x1B[1;1H");
-                    println!("VLC exited successfully");
+                    println!("Bye bye (^_^)/");
                 } else {
                     println!("VLC exited with an error: {:?}", status.code());
                 }
