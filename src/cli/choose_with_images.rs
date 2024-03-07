@@ -13,10 +13,7 @@ use ueberzug::{Scalers, UeConf};
 const MAX_OPTIONS: usize = 25;
 const COLOR: Color = Color::Yellow;
 
-pub fn choose_media_with_images(
-    options: &Vec<String>,
-    imgs_path: Vec<String>,
-) -> Result<usize, ()> {
+pub fn choose_with_images(options: &Vec<String>, imgs_path: Vec<String>) -> Result<usize, ()> {
     let mut stdout = stdout();
     let mut last_option = min(MAX_OPTIONS, options.len());
     let mut first_option = 0;

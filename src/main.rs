@@ -3,7 +3,7 @@ use crate::{
     fs::temp_dir::{create_temp_dir, remove_temp_dir},
 };
 use clap::{arg, Arg, Command};
-use cli::{choose_media::choose_media, choose_medias_with_images::choose_media_with_images};
+use cli::{choose_media::choose_media, choose_with_images::choose_with_images};
 use fs::posters::get_posters_path;
 use player::watch_media::watch_media;
 use tokio::runtime::Runtime;
@@ -84,7 +84,7 @@ fn main() {
                     .map(|media| media.title)
                     .collect();
 
-                match choose_media_with_images(&medias_title, posters_path) {
+                match choose_with_images(&medias_title, posters_path) {
                     Ok(media_index) => {
                         remove_temp_dir();
                         watch_media(medias[media_index].clone()).unwrap();
