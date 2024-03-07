@@ -67,18 +67,19 @@ fn main() {
                 panic!("Sorry, your query needs to be at least 4 characters")
             }
 
-            let media = get_medias(&media_name);
+            let medias = get_medias(&media_name);
 
-            if media.is_empty() {
+            if medias.is_empty() {
                 panic!("Couldn't find anything with your query")
             }
 
             if img_mode {
                 create_temp_dir();
                 let rt = Runtime::new().unwrap();
-                let future = get_posters_path(media.clone());
+                let future = get_posters_path(medias.clone());
                 let posters_path = rt.block_on(future).unwrap();
-                match choose_media_with_images(media.clone(), posters_path) {
+
+                match choose_media_with_images(medias.clone(), posters_path) {
                     Ok(media_link) => {
                         remove_temp_dir();
                         watch_media(media_link).unwrap();
@@ -89,7 +90,7 @@ fn main() {
                     }
                 }
             } else {
-                match choose_media(media) {
+                match choose_media(medias) {
                     Ok(media_link) => {
                         watch_media(media_link).unwrap();
                     }
