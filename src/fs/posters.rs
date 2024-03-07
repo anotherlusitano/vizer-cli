@@ -21,29 +21,22 @@ use std::{
 use futures::StreamExt;
 use reqwest::Client;
 
-use crate::media::Media;
-
 // this function basically downloads the image from each url
 // and creates the image file in the vizer temporary directory
-pub async fn get_posters_path(medias: Vec<Media>) -> Result<Vec<String>, Box<dyn error::Error>> {
+pub async fn get_posters_path(urls: Vec<String>) -> Result<Vec<String>, Box<dyn error::Error>> {
     let temp_dir = env::temp_dir();
-    let posters_path = Arc::new(Mutex::new(vec![None; medias.len()]));
+    let posters_path = Arc::new(Mutex::new(vec![None; urls.len()]));
 
     let client = Client::builder().build()?;
-    let fetches = futures::stream::iter(medias.into_iter().enumerate().map(|(index, media)| {
-        let send_future = client.get(&media.poster_url).send();
+    let fetches = futures::stream::iter(urls.into_iter().enumerate().map(|(index, url)| {
+        let send_future = client.get(&url).send();
         let vizer_temp = format!("{}/vizer", temp_dir.display());
         let posters_path = Arc::clone(&posters_path);
         async move {
             match send_future.await {
                 Ok(resp) => match resp.bytes().await {
                     Ok(img) => {
-                        let img_id = media
-                            .poster_url
-                            .split('/')
-                            .last()
-                            .unwrap()
-                            .trim_end_matches(".jpg");
+                        let img_id = url.split('/').last().unwrap().trim_end_matches(".jpg");
 
                         let path_img = format!("{}/{}.jpg", vizer_temp, img_id);
 
@@ -54,9 +47,9 @@ pub async fn get_posters_path(medias: Vec<Media>) -> Result<Vec<String>, Box<dyn
                             posters_path.lock().unwrap()[index] = Some(path_img.clone());
                         }
                     }
-                    Err(_) => println!("ERROR reading {}", media.poster_url),
+                    Err(_) => println!("ERROR reading {}", url),
                 },
-                Err(_) => println!("ERROR downloading {}", media.poster_url),
+                Err(_) => println!("ERROR downloading {}", url),
             }
         }
     }))
