@@ -5,11 +5,13 @@ use crate::{
 use clap::{arg, Arg, Command};
 use cli::{choose_media::choose_media, choose_with_images::choose_with_images};
 use fs::posters::get_posters_path;
+use inquire_style::set_inquire_style;
 use player::watch_media::watch_media;
 use tokio::runtime::Runtime;
 
 mod cli;
 mod fs;
+mod inquire_style;
 pub mod media;
 mod player;
 
@@ -101,6 +103,7 @@ fn main() {
                     }
                 }
             } else {
+                set_inquire_style();
                 match choose_media(medias) {
                     Ok(media) => {
                         watch_media(media, Some(img_mode)).unwrap();
