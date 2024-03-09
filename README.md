@@ -33,3 +33,4 @@ Options:
 - [rust](https://www.rust-lang.org/learn/get-started)
 - [vlc](https://www.videolan.org/vlc/)
 - [chromedriver](https://chromedriver.chromium.org/downloads)
+- [ueberzugpp](https://github.com/jstkdng/ueberzugpp)
