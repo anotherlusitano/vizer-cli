@@ -10,18 +10,18 @@ use crate::{
     fs::posters::get_posters_path,
     media::Media,
     player::vlc::open_vlc,
+    TRANSLATION,
 };
 
 #[tokio::main]
 pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResult<()> {
     let url = format!("https://vizer.in/{}", &media.url);
-
     let mut chromedriver = Command::new("chromedriver").spawn().unwrap();
     // we need to wait chromedriver to start :(
     sleep(Duration::from_millis(100));
 
     print!("\x1B[2J\x1B[1;1H");
-    println!("Preparing everything, which can take a while");
+    println!("{}", TRANSLATION.preparing_misc_text);
 
     let mut caps = DesiredCapabilities::chrome();
     caps.set_headless().unwrap();
@@ -56,9 +56,9 @@ pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResul
                 vec![season_element.to_json()?],
             )
             .await
-            .expect("Error: Can't click on the season");
+            .expect(TRANSLATION.click_season_err);
 
-        println!("Getting episodes");
+        println!("{}", TRANSLATION.getting_episodes_misc_text);
 
         let episodes_list = driver.find(By::ClassName("episodes")).await?;
 
@@ -70,7 +70,6 @@ pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResul
         for (i, item) in episodes_items.iter().enumerate() {
             if item.class_name().await?.unwrap() != "item unreleased " {
                 let episode_text = item.find(By::Tag("span")).await?.inner_html().await?;
-
                 // this thing of adding by 1
                 // is just to show the episodes starting in 1
                 let episode: String = format!("{} - {}", i + 1, episode_text);
@@ -108,10 +107,10 @@ pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResul
                 vec![episodes_items[episode_opt].to_json()?],
             )
             .await
-            .expect("Error: Can't click on the episode");
+            .expect(TRANSLATION.click_episode_err);
     }
 
-    println!("Getting languages options");
+    println!("{}", TRANSLATION.getting_language_misc_text);
 
     let langs_items = driver.query(By::Css("div[data-audio]")).all().await?;
 
@@ -121,7 +120,7 @@ pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResul
         let opt = lang
             .attr("data-audio")
             .await?
-            .expect("Couldn't retrieve languages options.");
+            .expect(TRANSLATION.language_option_expect);
         langs_opts.push(opt);
     }
 
@@ -138,7 +137,7 @@ pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResul
         }
     }
 
-    println!("Fetching service");
+    println!("{}", TRANSLATION.fetching_misc_text);
 
     let media_url = format!(
         "https://vizer.in/embed/getEmbed.php?id={}&sv=mixdrop",

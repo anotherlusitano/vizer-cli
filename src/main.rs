@@ -6,22 +6,35 @@ use clap::{arg, Arg, Command};
 use cli::{choose_media::choose_media, choose_with_images::choose_with_images};
 use fs::posters::get_posters_path;
 use inquire_style::set_inquire_style;
+use language::{english, portuguese, Translations};
 use player::watch_media::watch_media;
 use tokio::runtime::Runtime;
 
 mod cli;
 mod fs;
 mod inquire_style;
+pub mod language;
 pub mod media;
 mod player;
 
 static mut VIM_MODE: bool = false;
+static mut TRANSLATION_CHOOSER: Translations = portuguese();
+static TRANSLATION: &Translations = unsafe { &TRANSLATION_CHOOSER };
 
 fn main() {
     let matches = Command::new("vizer-cli")
         .about("CLI tool to watch movies/series/animes in portuguese")
         .subcommand_required(true)
         .arg_required_else_help(true)
+        .arg(
+            Arg::new("english")
+                .short('e')
+                .long("english")
+                .required(false)
+                .num_args(0)
+                .help("Change all the texts in the app to english")
+                .action(clap::ArgAction::SetTrue),
+        )
         .arg(
             Arg::new("vim")
                 .short('v')
@@ -48,12 +61,15 @@ fn main() {
                 .arg_required_else_help(true),
         )
         .get_matches();
-
     let mut img_mode = false;
     if matches.get_flag("vim") {
         unsafe { VIM_MODE = true };
     } else if matches.get_flag("img") {
         img_mode = true;
+    } if matches.get_flag("english") {
+        unsafe {
+            TRANSLATION_CHOOSER = english();
+        };
     }
 
     match matches.subcommand() {
@@ -66,13 +82,13 @@ fn main() {
 
             if media_name.len() < 4 {
                 // because the site only allows us to search more than 3 characters
-                panic!("Sorry, your query needs to be at least 4 characters")
+                panic!("{}", TRANSLATION.media_name_len_panic_text)
             }
 
             let medias = get_medias(&media_name);
 
             if medias.is_empty() {
-                panic!("Couldn't find anything with your query")
+                panic!("{}", TRANSLATION.media_name_is_empty_panic_text)
             }
 
             set_inquire_style();
@@ -115,6 +131,6 @@ fn main() {
                 }
             }
         }
-        _ => println!("No Choice?"),
+        _ => println!("{}", TRANSLATION.no_choice_misc_text),
     }
 }
