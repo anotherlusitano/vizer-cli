@@ -1,8 +1,9 @@
 use std::process::Command;
 
-pub fn open_vlc(video_url: &str) {
-    println!("Starting the player");
+use crate::TRANSLATION;
 
+pub fn open_vlc(video_url: &str) {
+    println!("{}", TRANSLATION.vlc_start_misc_text);
     let output = Command::new("vlc")
         .args(["--fullscreen", "--play-and-exit", video_url])
         .spawn();
@@ -12,17 +13,17 @@ pub fn open_vlc(video_url: &str) {
             Ok(status) => {
                 if status.success() {
                     print!("\x1B[2J\x1B[1;1H");
-                    println!("Bye bye (^_^)/");
+                    println!("{}", TRANSLATION.vlc_exit_misc_text);
                 } else {
-                    println!("VLC exited with an error: {:?}", status.code());
+                    println!("{} {:?}", TRANSLATION.vlc_exit_with_err, status.code());
                 }
             }
             Err(err) => {
-                println!("Failed to wait for VLC: {}", err);
+                println!("{} {}", TRANSLATION.vlc_wait_err, err);
             }
         },
         Err(err) => {
-            println!("Failed to start VLC: {}", err);
+            println!("{} {}", TRANSLATION.vlc_start_err, err);
         }
     }
 }

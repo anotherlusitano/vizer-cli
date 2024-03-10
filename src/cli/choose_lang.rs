@@ -1,11 +1,11 @@
 use inquire::{InquireError, Select};
 
-use crate::VIM_MODE;
+use crate::{TRANSLATION, VIM_MODE};
 
 pub fn choose_lang(langs: Vec<String>) -> Result<String, ()> {
     print!("\x1B[2J\x1B[1;1H");
 
-    let ans: Result<String, InquireError> = Select::new("Select the language option:", langs)
+    let ans: Result<String, InquireError> = Select::new(TRANSLATION.select_lang_misc_text, langs)
         .without_help_message()
         .with_page_size(2)
         .with_vim_mode(unsafe { VIM_MODE })
@@ -13,6 +13,6 @@ pub fn choose_lang(langs: Vec<String>) -> Result<String, ()> {
 
     match ans {
         Ok(choice) => Ok(choice),
-        Err(_) => Err(println!("There was an error, please try again")),
+        Err(_) => Err(println!("{}", TRANSLATION.choose_lang_err)),
     }
 }
