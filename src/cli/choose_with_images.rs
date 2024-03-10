@@ -1,5 +1,5 @@
 use crossterm::cursor::SetCursorStyle;
-use crossterm::event::{poll, read, Event, KeyCode};
+use crossterm::event::{poll, read, Event, KeyCode, KeyModifiers};
 use crossterm::style::{Color, ResetColor, SetForegroundColor};
 use crossterm::terminal::{self, Clear, ClearType};
 use crossterm::{cursor, QueueableCommand};
@@ -19,6 +19,7 @@ pub fn choose_with_images(options: &Vec<String>, imgs_path: Vec<String>) -> Resu
     let mut first_option = 0;
     let mut previous_option = 0;
     let mut current_option = 0;
+    let mut quit = false;
 
     let (mut width, mut height) = terminal::size().unwrap();
 
@@ -43,7 +44,7 @@ pub fn choose_with_images(options: &Vec<String>, imgs_path: Vec<String>) -> Resu
         ..Default::default()
     });
 
-    loop {
+    while !quit {
         while poll(Duration::ZERO).unwrap() {
             match read().unwrap() {
                 Event::Resize(nw, nh) => {
@@ -176,6 +177,14 @@ pub fn choose_with_images(options: &Vec<String>, imgs_path: Vec<String>) -> Resu
                         terminal::disable_raw_mode().unwrap();
                         return Ok(current_option);
                     }
+                    KeyCode::Esc => {
+                        quit = true;
+                    }
+                    KeyCode::Char(x) => {
+                        if event.modifiers.contains(KeyModifiers::CONTROL) && x == 'c' {
+                            quit = true
+                        }
+                    }
                     _ => {}
                 },
 
@@ -202,6 +211,11 @@ pub fn choose_with_images(options: &Vec<String>, imgs_path: Vec<String>) -> Resu
         stdout.flush().unwrap();
         sleep(Duration::from_millis(33))
     }
+    stdout.queue(ResetColor).unwrap();
+    stdout.queue(Clear(ClearType::All)).unwrap();
+    stdout.queue(cursor::MoveTo(0, 0)).unwrap();
+    terminal::disable_raw_mode().unwrap();
+    Err(())
 }
 
 fn write_options(
