@@ -50,12 +50,15 @@ pub struct Translations {
 
     //=====# vlc.rs translations #=====//
     //misc text
-    pub vlc_start_misc_text: &'static str,
-    pub vlc_exit_misc_text: &'static str,
+    pub players_start_misc_text: &'static str,
+    pub players_exit_misc_text: &'static str,
     // err text
     pub vlc_exit_with_err: &'static str,
     pub vlc_wait_err: &'static str,
     pub vlc_start_err: &'static str,
+    pub mpv_exit_with_err: &'static str,
+    pub mpv_wait_err: &'static str,
+    pub mpv_start_err: &'static str,
 
     //=====# watch_media.rs translations #=====//
     //misc text
@@ -123,12 +126,15 @@ pub const fn portuguese() -> Translations {
 
         //=====# vlc.rs translations #=====//
         //misc text
-        vlc_start_misc_text: "Iniciando o reprodutor de mídia",
-        vlc_exit_misc_text: "Tchau Tchau (^_^)/",
+        players_start_misc_text: "Iniciando o reprodutor de mídia",
+        players_exit_misc_text: "Tchau Tchau (^_^)/",
         // err text
         vlc_exit_with_err: "VLC fechou com um erro:",
         vlc_wait_err: "Falha ao esperar por VLC:",
         vlc_start_err: "Falha ao iniciar o VLC:",
+        mpv_exit_with_err: "MPV fechou com um erro:", 
+        mpv_wait_err: "Falha ao esperar por MPV:", 
+        mpv_start_err: "Falha ao iniciar o MPV:",
 
         //=====# watch_media.rs translations #=====//
         //misc text
@@ -197,14 +203,18 @@ pub const fn english() -> Translations {
         //expect
         response_expect: "Could not load url.",
 
-        //=====# vlc.rs translations #=====//
-        //misc text
-        vlc_start_misc_text: "Starting the player",
-        vlc_exit_misc_text: "Bye bye (^_^)/",
-        // err text
+        //=====# vlc.rs && mpv.rs translations #=====//
+        // (vlc.rs && mpv.rs) misc text
+        players_start_misc_text: "Starting the player",
+        players_exit_misc_text: "Bye bye (^_^)/",
+        // vlc.rs err text
         vlc_exit_with_err: "VLC exited with an error:",
         vlc_wait_err: "Failed to wait for VLC:",
         vlc_start_err: "Failed to start VLC:",
+        // mpv.rs err text
+        mpv_exit_with_err: "MPV exited with an error:",
+        mpv_wait_err: "Failed to wait for MPV:",
+        mpv_start_err: "Failed to start MPV:",
 
         //=====# watch_media.rs translations #=====//
         //misc text
