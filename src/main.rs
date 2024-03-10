@@ -19,6 +19,7 @@ mod player;
 
 static mut VIM_MODE: bool = false;
 static mut TRANSLATION_CHOOSER: Translations = portuguese();
+static mut USE_MPV: bool = false; 
 static TRANSLATION: &Translations = unsafe { &TRANSLATION_CHOOSER };
 
 fn main() {
@@ -33,6 +34,15 @@ fn main() {
                 .required(false)
                 .num_args(0)
                 .help("Change all the texts in the app to english")
+                .action(clap::ArgAction::SetTrue),
+        )
+        .arg(
+            Arg::new("mpv")
+                .short('m')
+                .long("mpv")
+                .required(false)
+                .num_args(0)
+                .help("Use MPV media player instead of VLC")
                 .action(clap::ArgAction::SetTrue),
         )
         .arg(
@@ -70,6 +80,10 @@ fn main() {
         unsafe {
             TRANSLATION_CHOOSER = english();
         };
+    } if matches.get_flag("mpv") {
+        unsafe {
+            USE_MPV = true;
+        }
     }
 
     match matches.subcommand() {

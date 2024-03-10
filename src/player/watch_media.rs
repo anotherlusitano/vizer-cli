@@ -10,7 +10,8 @@ use crate::{
     fs::posters::get_posters_path,
     media::Media,
     player::vlc::open_vlc,
-    TRANSLATION,
+    player::mpv::open_mpv,
+    TRANSLATION, USE_MPV,
 };
 
 #[tokio::main]
@@ -169,8 +170,12 @@ pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResul
 
     driver.quit().await?;
     chromedriver.kill().unwrap();
-
-    open_vlc(&video_url);
+    
+    if unsafe{USE_MPV} {
+        open_mpv(&video_url);
+    } else {
+        open_vlc(&video_url);
+    }
 
     Ok(())
 }
