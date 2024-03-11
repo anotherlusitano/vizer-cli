@@ -76,7 +76,8 @@ fn main() {
         unsafe { VIM_MODE = true };
     } else if matches.get_flag("img") {
         img_mode = true;
-    } if matches.get_flag("english") {
+    }
+    if matches.get_flag("english") {
         unsafe {
             TRANSLATION_CHOOSER = english();
         };
@@ -124,7 +125,7 @@ fn main() {
                 let future = get_posters_path(medias_poster_url);
                 let posters_path = rt.block_on(future).unwrap();
 
-                match choose_with_images(&medias_title, posters_path) {
+                match choose_with_images(&medias_title, posters_path, true) {
                     Ok(media_index) => {
                         watch_media(medias[media_index].clone(), Some(img_mode)).unwrap();
                         remove_temp_dir();
