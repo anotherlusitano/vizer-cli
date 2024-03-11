@@ -23,9 +23,10 @@ Commands:
   help        Print this message or the help of the given subcommand(s)
 
 Options:
-  -v, --vim   VIM Mode for the enthusiast (only works without the image preview)
+  -e, --english        Change all the texts in the app to english
+  -v, --vim            VIM Mode for the enthusiast
   -i, --image-preview  Enable you to see the posters as you choose them
-  -h, --help  Print help
+  -h, --help           Print help
 ```
 
 ## Dependencies
