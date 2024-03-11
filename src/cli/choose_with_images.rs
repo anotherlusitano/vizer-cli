@@ -10,10 +10,16 @@ use std::thread::sleep;
 use std::time::Duration;
 use ueberzug::{Scalers, UeConf};
 
+use crate::TRANSLATION;
+
 const MAX_OPTIONS: usize = 25;
 const COLOR: Color = Color::Yellow;
 
-pub fn choose_with_images(options: &Vec<String>, imgs_path: Vec<String>) -> Result<usize, ()> {
+pub fn choose_with_images(
+    options: &Vec<String>,
+    imgs_path: Vec<String>,
+    is_to_choose_media: bool,
+) -> Result<usize, ()> {
     let mut stdout = stdout();
     let mut last_option = min(MAX_OPTIONS, options.len());
     let mut first_option = 0;
@@ -26,8 +32,15 @@ pub fn choose_with_images(options: &Vec<String>, imgs_path: Vec<String>) -> Resu
     terminal::enable_raw_mode().unwrap();
     stdout.queue(SetCursorStyle::SteadyBar).unwrap();
 
-    write_options(&mut stdout, options, first_option, last_option, 0);
-    stdout.queue(cursor::MoveTo(0, 0)).unwrap();
+    write_options(
+        &mut stdout,
+        options,
+        first_option,
+        last_option,
+        1,
+        is_to_choose_media,
+    );
+    stdout.queue(cursor::MoveTo(0, 1)).unwrap();
 
     let mut img_width = width / 2;
     let padding_right = 2;
@@ -72,14 +85,14 @@ pub fn choose_with_images(options: &Vec<String>, imgs_path: Vec<String>) -> Resu
                         let (_, row) = crossterm::cursor::position().unwrap();
                         let cursor_pos = row;
 
-                        if row == 0 && first_option == 0 {
+                        if row == 1 && first_option == 0 {
                             break;
                         }
 
                         current_option -= 1;
 
                         if options.len() > MAX_OPTIONS {
-                            if row == 0 && first_option != 0 {
+                            if row == 1 && first_option != 0 {
                                 first_option -= 1;
                                 last_option -= 1;
                                 write_options(
@@ -88,6 +101,7 @@ pub fn choose_with_images(options: &Vec<String>, imgs_path: Vec<String>) -> Resu
                                     first_option,
                                     last_option,
                                     cursor_pos,
+                                    is_to_choose_media,
                                 );
                                 stdout.queue(cursor::MoveTo(0, row)).unwrap();
                             } else {
@@ -97,6 +111,7 @@ pub fn choose_with_images(options: &Vec<String>, imgs_path: Vec<String>) -> Resu
                                     first_option,
                                     last_option,
                                     cursor_pos - 1,
+                                    is_to_choose_media,
                                 );
                                 stdout.queue(cursor::MoveTo(0, row)).unwrap();
                                 stdout.queue(cursor::MoveToPreviousLine(1)).unwrap();
@@ -109,6 +124,7 @@ pub fn choose_with_images(options: &Vec<String>, imgs_path: Vec<String>) -> Resu
                                 first_option,
                                 last_option,
                                 cursor_pos - 1,
+                                is_to_choose_media,
                             );
                             stdout.queue(cursor::MoveTo(0, row)).unwrap();
                             stdout.queue(cursor::MoveToPreviousLine(1)).unwrap();
@@ -119,11 +135,11 @@ pub fn choose_with_images(options: &Vec<String>, imgs_path: Vec<String>) -> Resu
                         let cursor_pos = row;
 
                         let middle_row_without_all_options: bool =
-                            row != (MAX_OPTIONS.div(2)) as u16 && last_option < options.len();
+                            row != MAX_OPTIONS.div(2) as u16 && last_option < options.len();
                         let second_to_last_row_with_all_options: bool =
-                            row != (MAX_OPTIONS - 1) as u16 && last_option == options.len();
+                            row != MAX_OPTIONS as u16 && last_option == options.len();
                         let last_row_with_all_options: bool =
-                            row == (MAX_OPTIONS - 1) as u16 && last_option == options.len();
+                            row == MAX_OPTIONS as u16 && last_option == options.len();
 
                         if options.len() > MAX_OPTIONS {
                             if last_row_with_all_options {
@@ -140,6 +156,7 @@ pub fn choose_with_images(options: &Vec<String>, imgs_path: Vec<String>) -> Resu
                                     first_option,
                                     last_option,
                                     cursor_pos + 1,
+                                    is_to_choose_media,
                                 );
                                 stdout.queue(cursor::MoveTo(0, row)).unwrap();
                                 stdout.queue(cursor::MoveToNextLine(1)).unwrap();
@@ -152,11 +169,12 @@ pub fn choose_with_images(options: &Vec<String>, imgs_path: Vec<String>) -> Resu
                                     first_option,
                                     last_option,
                                     cursor_pos,
+                                    is_to_choose_media,
                                 );
                                 stdout.queue(cursor::MoveTo(0, cursor_pos)).unwrap();
                             }
                         }
-                        if options.len() <= MAX_OPTIONS && row != (last_option - 1) as u16 {
+                        if options.len() <= MAX_OPTIONS && row != last_option as u16 {
                             current_option += 1;
 
                             write_options(
@@ -165,6 +183,7 @@ pub fn choose_with_images(options: &Vec<String>, imgs_path: Vec<String>) -> Resu
                                 first_option,
                                 last_option,
                                 cursor_pos + 1,
+                                is_to_choose_media,
                             );
                             stdout.queue(cursor::MoveTo(0, row)).unwrap();
                             stdout.queue(cursor::MoveToNextLine(1)).unwrap();
@@ -224,23 +243,47 @@ fn write_options(
     first_option: usize,
     last_option: usize,
     cursor_pos: u16,
+    is_to_choose_media: bool,
 ) {
     let mut row: u16 = 0;
 
     stdout.queue(cursor::MoveTo(0, row)).unwrap();
     stdout.queue(Clear(ClearType::All)).unwrap();
 
+    if is_to_choose_media {
+        stdout
+            .write_all(TRANSLATION.select_media_misc_text.as_bytes())
+            .unwrap();
+    } else {
+        stdout
+            .write_all(TRANSLATION.select_episode_misc_text.as_bytes())
+            .unwrap();
+    }
+
     for option in &options[first_option..last_option] {
+        row += 1;
+        stdout.queue(cursor::MoveTo(0, row)).unwrap();
+
         let selected_option = format!("> {}", option);
         let unselected_option = format!("  {}", option);
+
         if row == cursor_pos {
             stdout.queue(SetForegroundColor(COLOR)).unwrap();
             stdout.write_all(selected_option.as_bytes()).unwrap();
-        } else {
             stdout.queue(ResetColor).unwrap();
+        } else {
             stdout.write_all(unselected_option.as_bytes()).unwrap();
         }
-        row += 1;
-        stdout.queue(cursor::MoveTo(0, row)).unwrap();
     }
+
+    stdout.queue(cursor::MoveTo(0, row + 1)).unwrap();
+
+    let total = &options.len();
+    let total_text = if is_to_choose_media {
+        format!("[{} {}]", TRANSLATION.total_media_misc_text, total)
+    } else {
+        format!("[{} {}]", TRANSLATION.total_episode_misc_text, total)
+    };
+
+    stdout.write_all(total_text.as_bytes()).unwrap();
 }

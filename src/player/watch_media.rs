@@ -90,7 +90,7 @@ pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResul
                 Some(true) => {
                     let posters_path = get_posters_path(episodes_img_url).await.unwrap();
 
-                    choose_with_images(&episodes_opt, posters_path).unwrap()
+                    choose_with_images(&episodes_opt, posters_path, false).unwrap()
                 }
                 _ => choose_episode(episodes_opt).unwrap(),
             }
