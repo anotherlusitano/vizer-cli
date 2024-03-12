@@ -3,15 +3,17 @@ use inquire::{InquireError, Select};
 use crate::{TRANSLATION, VIM_MODE};
 
 pub fn choose_episode(episodes: Vec<String>) -> Result<usize, ()> {
+    let language = TRANSLATION.get().unwrap();
+    let vim_mode = VIM_MODE.get().unwrap();
     print!("\x1B[2J\x1B[1;1H");
 
-    let help_msg = format!("{} {}", TRANSLATION.total_episode_misc_text, episodes.len());
+    let help_msg = format!("{} {}", language.total_episode_misc_text, episodes.len());
 
     let ans: Result<String, InquireError> =
-        Select::new(TRANSLATION.select_episode_misc_text, episodes)
+        Select::new(language.select_episode_misc_text, episodes)
             .with_help_message(&help_msg)
             .with_page_size(25)
-            .with_vim_mode(unsafe { VIM_MODE })
+            .with_vim_mode(*vim_mode)
             .prompt();
 
     match ans {
@@ -22,6 +24,6 @@ pub fn choose_episode(episodes: Vec<String>) -> Result<usize, ()> {
 
             Ok(episode)
         }
-        Err(_) => Err(println!("{}", TRANSLATION.choose_episode_err)),
+        Err(_) => Err(println!("{}", language.choose_episode_err)),
     }
 }

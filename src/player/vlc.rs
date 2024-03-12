@@ -3,7 +3,9 @@ use std::process::Command;
 use crate::TRANSLATION;
 
 pub fn open_vlc(video_url: &str) {
-    println!("{}", TRANSLATION.players_start_misc_text);
+    let language = TRANSLATION.get().unwrap();
+
+    println!("{}", language.players_start_misc_text);
     let output = Command::new("vlc")
         .args(["--fullscreen", "--play-and-exit", video_url])
         .spawn();
@@ -13,17 +15,17 @@ pub fn open_vlc(video_url: &str) {
             Ok(status) => {
                 if status.success() {
                     print!("\x1B[2J\x1B[1;1H");
-                    println!("{}", TRANSLATION.players_exit_misc_text);
+                    println!("{}", language.players_exit_misc_text);
                 } else {
-                    println!("{} {:?}", TRANSLATION.vlc_exit_with_err, status.code());
+                    println!("{} {:?}", language.vlc_exit_with_err, status.code());
                 }
             }
             Err(err) => {
-                println!("{} {}", TRANSLATION.vlc_wait_err, err);
+                println!("{} {}", language.vlc_wait_err, err);
             }
         },
         Err(err) => {
-            println!("{} {}", TRANSLATION.vlc_start_err, err);
+            println!("{} {}", language.vlc_start_err, err);
         }
     }
 }
