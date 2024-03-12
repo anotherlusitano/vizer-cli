@@ -21,7 +21,7 @@ mod player;
 
 static TRANSLATION: OnceLock<Translations> = OnceLock::new();
 static mut VIM_MODE: bool = false;
-static mut USE_MPV: bool = false;
+static USE_MPV: OnceLock<bool> = OnceLock::new();
 
 fn main() {
     let matches = Command::new("vizer-cli")
@@ -84,9 +84,9 @@ fn main() {
         TRANSLATION.get_or_init(|| get_translation("portuguese"));
     }
     if matches.get_flag("mpv") {
-        unsafe {
-            USE_MPV = true;
-        }
+        USE_MPV.get_or_init(|| true);
+    } else {
+        USE_MPV.get_or_init(|| false);
     }
 
     let language = TRANSLATION.get().unwrap();

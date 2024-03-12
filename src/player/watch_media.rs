@@ -17,6 +17,7 @@ use crate::{
 #[tokio::main]
 pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResult<()> {
     let language = TRANSLATION.get().unwrap();
+    let use_mpv = USE_MPV.get().unwrap();
 
     let url = format!("https://vizer.in/{}", &media.url);
     let mut chromedriver = Command::new("chromedriver").spawn().unwrap();
@@ -173,7 +174,7 @@ pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResul
     driver.quit().await?;
     chromedriver.kill().unwrap();
 
-    if unsafe { USE_MPV } {
+    if *use_mpv {
         open_mpv(&video_url);
     } else {
         open_vlc(&video_url);
