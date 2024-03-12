@@ -20,7 +20,7 @@ pub mod media;
 mod player;
 
 static TRANSLATION: OnceLock<Translations> = OnceLock::new();
-static mut VIM_MODE: bool = false;
+static VIM_MODE: OnceLock<bool> = OnceLock::new();
 static USE_MPV: OnceLock<bool> = OnceLock::new();
 
 fn main() {
@@ -72,17 +72,24 @@ fn main() {
                 .arg_required_else_help(true),
         )
         .get_matches();
-    let mut img_mode = false;
+
     if matches.get_flag("vim") {
-        unsafe { VIM_MODE = true };
-    } else if matches.get_flag("img") {
+        VIM_MODE.get_or_init(|| true);
+    } else {
+        VIM_MODE.get_or_init(|| false);
+    }
+
+    let mut img_mode = false;
+    if matches.get_flag("img") && !matches.get_flag("vim") {
         img_mode = true;
     }
+
     if matches.get_flag("english") {
         TRANSLATION.get_or_init(|| get_translation("english"));
     } else {
         TRANSLATION.get_or_init(|| get_translation("portuguese"));
     }
+
     if matches.get_flag("mpv") {
         USE_MPV.get_or_init(|| true);
     } else {
