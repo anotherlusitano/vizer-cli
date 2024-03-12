@@ -1,3 +1,5 @@
+use std::sync::OnceLock;
+
 use crate::{
     cli::get_medias::get_medias,
     fs::temp_dir::{create_temp_dir, remove_temp_dir},
@@ -6,7 +8,7 @@ use clap::{arg, Arg, Command};
 use cli::{choose_media::choose_media, choose_with_images::choose_with_images};
 use fs::posters::get_posters_path;
 use inquire_style::set_inquire_style;
-use language::{english, portuguese, Translations};
+use language::{get_translation, Translations};
 use player::watch_media::watch_media;
 use tokio::runtime::Runtime;
 
@@ -17,10 +19,9 @@ pub mod language;
 pub mod media;
 mod player;
 
+static TRANSLATION: OnceLock<Translations> = OnceLock::new();
 static mut VIM_MODE: bool = false;
-static mut TRANSLATION_CHOOSER: Translations = portuguese();
 static mut USE_MPV: bool = false;
-static TRANSLATION: &Translations = unsafe { &TRANSLATION_CHOOSER };
 
 fn main() {
     let matches = Command::new("vizer-cli")
@@ -78,15 +79,17 @@ fn main() {
         img_mode = true;
     }
     if matches.get_flag("english") {
-        unsafe {
-            TRANSLATION_CHOOSER = english();
-        };
+        TRANSLATION.get_or_init(|| get_translation("english"));
+    } else {
+        TRANSLATION.get_or_init(|| get_translation("portuguese"));
     }
     if matches.get_flag("mpv") {
         unsafe {
             USE_MPV = true;
         }
     }
+
+    let language = TRANSLATION.get().unwrap();
 
     match matches.subcommand() {
         Some(("search", sub_matches)) => {
@@ -98,13 +101,13 @@ fn main() {
 
             if media_name.len() < 4 {
                 // because the site only allows us to search more than 3 characters
-                panic!("{}", TRANSLATION.media_name_len_panic_text)
+                panic!("{}", language.media_name_len_panic_text)
             }
 
             let medias = get_medias(&media_name);
 
             if medias.is_empty() {
-                panic!("{}", TRANSLATION.media_name_is_empty_panic_text)
+                panic!("{}", language.media_name_is_empty_panic_text)
             }
 
             set_inquire_style();
@@ -147,6 +150,6 @@ fn main() {
                 }
             }
         }
-        _ => println!("{}", TRANSLATION.no_choice_misc_text),
+        _ => println!("{}", language.no_choice_misc_text),
     }
 }

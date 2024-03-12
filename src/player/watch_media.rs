@@ -9,20 +9,22 @@ use crate::{
     },
     fs::posters::get_posters_path,
     media::Media,
-    player::vlc::open_vlc,
     player::mpv::open_mpv,
+    player::vlc::open_vlc,
     TRANSLATION, USE_MPV,
 };
 
 #[tokio::main]
 pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResult<()> {
+    let language = TRANSLATION.get().unwrap();
+
     let url = format!("https://vizer.in/{}", &media.url);
     let mut chromedriver = Command::new("chromedriver").spawn().unwrap();
     // we need to wait chromedriver to start :(
     sleep(Duration::from_millis(100));
 
     print!("\x1B[2J\x1B[1;1H");
-    println!("{}", TRANSLATION.preparing_misc_text);
+    println!("{}", language.preparing_misc_text);
 
     let mut caps = DesiredCapabilities::chrome();
     caps.set_headless().unwrap();
@@ -57,9 +59,9 @@ pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResul
                 vec![season_element.to_json()?],
             )
             .await
-            .expect(TRANSLATION.click_season_err);
+            .expect(language.click_season_err);
 
-        println!("{}", TRANSLATION.getting_episodes_misc_text);
+        println!("{}", language.getting_episodes_misc_text);
 
         let episodes_list = driver.find(By::ClassName("episodes")).await?;
 
@@ -108,10 +110,10 @@ pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResul
                 vec![episodes_items[episode_opt].to_json()?],
             )
             .await
-            .expect(TRANSLATION.click_episode_err);
+            .expect(language.click_episode_err);
     }
 
-    println!("{}", TRANSLATION.getting_language_misc_text);
+    println!("{}", language.getting_language_misc_text);
 
     let langs_items = driver.query(By::Css("div[data-audio]")).all().await?;
 
@@ -121,7 +123,7 @@ pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResul
         let opt = lang
             .attr("data-audio")
             .await?
-            .expect(TRANSLATION.language_option_expect);
+            .expect(language.language_option_expect);
         langs_opts.push(opt);
     }
 
@@ -138,7 +140,7 @@ pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResul
         }
     }
 
-    println!("{}", TRANSLATION.fetching_misc_text);
+    println!("{}", language.fetching_misc_text);
 
     let media_url = format!(
         "https://vizer.in/embed/getEmbed.php?id={}&sv=mixdrop",
@@ -170,8 +172,8 @@ pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResul
 
     driver.quit().await?;
     chromedriver.kill().unwrap();
-    
-    if unsafe{USE_MPV} {
+
+    if unsafe { USE_MPV } {
         open_mpv(&video_url);
     } else {
         open_vlc(&video_url);

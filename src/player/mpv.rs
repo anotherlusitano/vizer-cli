@@ -3,9 +3,11 @@ use std::process::Command;
 use crate::TRANSLATION;
 
 pub fn open_mpv(video_url: &str) {
-    println!("{}", TRANSLATION.players_start_misc_text);
+    let language = TRANSLATION.get().unwrap();
+
+    println!("{}", language.players_start_misc_text);
     let output = Command::new("mpv")
-        .args(["--fs", "--really-quiet",  video_url])
+        .args(["--fs", "--really-quiet", video_url])
         .spawn();
 
     match output {
@@ -13,17 +15,17 @@ pub fn open_mpv(video_url: &str) {
             Ok(status) => {
                 if status.success() {
                     print!("\x1B[2J\x1B[1;1H");
-                    println!("{}", TRANSLATION.players_exit_misc_text);
+                    println!("{}", language.players_exit_misc_text);
                 } else {
-                    println!("{} {:?}", TRANSLATION.mpv_exit_with_err, status.code());
+                    println!("{} {:?}", language.mpv_exit_with_err, status.code());
                 }
             }
             Err(err) => {
-                println!("{} {}", TRANSLATION.mpv_wait_err, err);
+                println!("{} {}", language.mpv_wait_err, err);
             }
         },
         Err(err) => {
-            println!("{} {}", TRANSLATION.mpv_start_err, err);
+            println!("{} {}", language.mpv_start_err, err);
         }
     }
 }

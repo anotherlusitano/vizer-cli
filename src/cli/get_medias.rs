@@ -4,8 +4,10 @@ use crate::{media::Media, TRANSLATION};
 
 #[tokio::main]
 pub async fn get_medias(media_name: &str) -> Vec<Media> {
+    let language = TRANSLATION.get().unwrap();
+
     let url = format!("https://vizer.in/pesquisar/{}", media_name);
-    let response = reqwest::get(url).await.expect(TRANSLATION.response_expect);
+    let response = reqwest::get(url).await.expect(language.response_expect);
     let html = response.text().await.unwrap();
 
     let document = Html::parse_document(html.as_str());

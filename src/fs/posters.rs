@@ -26,6 +26,8 @@ use crate::TRANSLATION;
 // this function basically downloads the image from each url
 // and creates the image file in the vizer temporary directory
 pub async fn get_posters_path(urls: Vec<String>) -> Result<Vec<String>, Box<dyn error::Error>> {
+    let language = TRANSLATION.get().unwrap();
+
     let temp_dir = env::temp_dir();
     let posters_path = Arc::new(Mutex::new(vec![None; urls.len()]));
 
@@ -42,16 +44,16 @@ pub async fn get_posters_path(urls: Vec<String>) -> Result<Vec<String>, Box<dyn 
 
                         let path_img = format!("{}/{}.jpg", vizer_temp, img_id);
 
-                        let msg = format!("{}, {}", TRANSLATION.msg_err, path_img);
+                        let msg = format!("{}, {}", language.msg_err, path_img);
                         if let Err(e) = fs::write(&path_img, img) {
                             println!("{}: {}", msg, e);
                         } else {
                             posters_path.lock().unwrap()[index] = Some(path_img.clone());
                         }
                     }
-                    Err(_) => println!("{} {}", TRANSLATION.reading_err, url),
+                    Err(_) => println!("{} {}", language.reading_err, url),
                 },
-                Err(_) => println!("{} {}", TRANSLATION.downloading_err, url),
+                Err(_) => println!("{} {}", language.downloading_err, url),
             }
         }
     }))

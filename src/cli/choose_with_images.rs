@@ -245,6 +245,7 @@ fn write_options(
     cursor_pos: u16,
     is_to_choose_media: bool,
 ) {
+    let language = TRANSLATION.get().unwrap();
     let mut row: u16 = 0;
 
     stdout.queue(cursor::MoveTo(0, row)).unwrap();
@@ -252,11 +253,11 @@ fn write_options(
 
     if is_to_choose_media {
         stdout
-            .write_all(TRANSLATION.select_media_misc_text.as_bytes())
+            .write_all(language.select_media_misc_text.as_bytes())
             .unwrap();
     } else {
         stdout
-            .write_all(TRANSLATION.select_episode_misc_text.as_bytes())
+            .write_all(language.select_episode_misc_text.as_bytes())
             .unwrap();
     }
 
@@ -280,9 +281,9 @@ fn write_options(
 
     let total = &options.len();
     let total_text = if is_to_choose_media {
-        format!("[{} {}]", TRANSLATION.total_media_misc_text, total)
+        format!("[{} {}]", language.total_media_misc_text, total)
     } else {
-        format!("[{} {}]", TRANSLATION.total_episode_misc_text, total)
+        format!("[{} {}]", language.total_episode_misc_text, total)
     };
 
     stdout.write_all(total_text.as_bytes()).unwrap();
