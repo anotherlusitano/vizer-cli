@@ -74,7 +74,7 @@ pub struct Translations {
 }
 
 pub const fn portuguese() -> Translations {
-    let portuguese_translation = Translations {
+    Translations {
         //=====# main.rs translations #=====//
         //panic text
         media_name_len_panic_text: "Desculpe, sua pesquisa precisa ter no mínimo 4 caracteres",
@@ -132,8 +132,8 @@ pub const fn portuguese() -> Translations {
         vlc_exit_with_err: "VLC fechou com um erro:",
         vlc_wait_err: "Falha ao esperar por VLC:",
         vlc_start_err: "Falha ao iniciar o VLC:",
-        mpv_exit_with_err: "MPV fechou com um erro:", 
-        mpv_wait_err: "Falha ao esperar por MPV:", 
+        mpv_exit_with_err: "MPV fechou com um erro:",
+        mpv_wait_err: "Falha ao esperar por MPV:",
         mpv_start_err: "Falha ao iniciar o MPV:",
 
         //=====# watch_media.rs translations #=====//
@@ -147,13 +147,11 @@ pub const fn portuguese() -> Translations {
         click_episode_err: "Erro: Não é possível clicar no episódio",
         //expect text
         language_option_expect: "Não foi possível adquirir opções de linguagens.",
-    };
-
-    portuguese_translation
+    }
 }
 
 pub const fn english() -> Translations {
-    let english_translation = Translations {
+    Translations {
         //=====# main.rs translations #=====//
         //panic text
         media_name_len_panic_text: "Sorry, your query needs to be at least 4 characters",
@@ -227,7 +225,5 @@ pub const fn english() -> Translations {
         click_episode_err: "Error: Can't click on the episode",
         //expect text
         language_option_expect: "Couldn't retrieve languages options.",
-    };
-
-    english_translation
+    }
 }

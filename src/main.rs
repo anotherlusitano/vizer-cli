@@ -19,7 +19,7 @@ mod player;
 
 static mut VIM_MODE: bool = false;
 static mut TRANSLATION_CHOOSER: Translations = portuguese();
-static mut USE_MPV: bool = false; 
+static mut USE_MPV: bool = false;
 static TRANSLATION: &Translations = unsafe { &TRANSLATION_CHOOSER };
 
 fn main() {
@@ -81,7 +81,8 @@ fn main() {
         unsafe {
             TRANSLATION_CHOOSER = english();
         };
-    } if matches.get_flag("mpv") {
+    }
+    if matches.get_flag("mpv") {
         unsafe {
             USE_MPV = true;
         }
