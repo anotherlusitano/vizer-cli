@@ -10,6 +10,7 @@ use fs::posters::get_posters_path;
 use inquire_style::set_inquire_style;
 use language::{get_translation, Translations};
 use player::watch_media::watch_media;
+use scraper::is_offline::is_offline;
 use tokio::runtime::Runtime;
 
 mod cli;
@@ -18,6 +19,7 @@ mod inquire_style;
 pub mod language;
 pub mod media;
 mod player;
+mod scraper;
 
 static TRANSLATION: OnceLock<Translations> = OnceLock::new();
 static VIM_MODE: OnceLock<bool> = OnceLock::new();
@@ -97,6 +99,10 @@ fn main() {
     }
 
     let language = TRANSLATION.get().unwrap();
+
+    if is_offline() {
+        panic!("{}", language.is_currently_offline)
+    }
 
     match matches.subcommand() {
         Some(("search", sub_matches)) => {
