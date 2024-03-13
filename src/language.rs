@@ -3,6 +3,7 @@ pub struct Translations {
     //panic text
     pub media_name_len_panic_text: &'static str,
     pub media_name_is_empty_panic_text: &'static str,
+    pub is_currently_offline: &'static str,
     //misc text
     pub no_choice_misc_text: &'static str,
 
@@ -78,6 +79,7 @@ const PORTUGUESE: Translations = Translations {
     //panic text
     media_name_len_panic_text: "Desculpe, sua pesquisa precisa ter no mínimo 4 caracteres",
     media_name_is_empty_panic_text: "Não conseguimos achar nada com sua pesquisa",
+    is_currently_offline: "Desculpe, mas o website encontra-se fora de serviço :(",
     //misc text
     no_choice_misc_text: "Nenhuma Escolha?",
 
@@ -153,6 +155,7 @@ const ENGLISH: Translations = Translations {
     //panic text
     media_name_len_panic_text: "Sorry, your query needs to be at least 4 characters",
     media_name_is_empty_panic_text: "Couldn't find anything with your query",
+    is_currently_offline: "Sorry, but the website is currently offline :(",
     //misc text
     no_choice_misc_text: "No Choice?",
 
