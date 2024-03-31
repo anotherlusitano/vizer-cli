@@ -82,7 +82,7 @@ fn main() {
     }
 
     let mut img_mode = false;
-    if matches.get_flag("img") && !matches.get_flag("vim") {
+    if matches.get_flag("img") {
         img_mode = true;
     }
 
