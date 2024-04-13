@@ -1,4 +1,4 @@
-use std::sync::OnceLock;
+use std::{process::exit, sync::OnceLock};
 
 use crate::{
     cli::get_medias::get_medias,
@@ -101,7 +101,8 @@ fn main() {
     let language = TRANSLATION.get().unwrap();
 
     if is_offline() {
-        panic!("{}", language.is_currently_offline)
+        eprintln!("{}", language.is_currently_offline);
+        exit(1)
     }
 
     match matches.subcommand() {
@@ -114,13 +115,15 @@ fn main() {
 
             if media_name.len() < 4 {
                 // because the site only allows us to search more than 3 characters
-                panic!("{}", language.media_name_len_panic_text)
+                eprintln!("{}", language.media_name_len_exit_text);
+                exit(1)
             }
 
             let medias = get_medias(&media_name);
 
             if medias.is_empty() {
-                panic!("{}", language.media_name_is_empty_panic_text)
+                eprintln!("{}", language.media_name_is_empty_exit_text);
+                exit(1)
             }
 
             set_inquire_style();
