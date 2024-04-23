@@ -35,3 +35,15 @@ Options:
 - [vlc](https://www.videolan.org/vlc/)
 - [chromedriver](https://chromedriver.chromium.org/downloads)
 - [ueberzugpp](https://github.com/jstkdng/ueberzugpp)
+
+## Contributing
+Contributions are always welcome! To contribute, please follow these steps:
+
+1. Fork the repository
+2. Create a new branch
+3. Make your changes
+4. Use `cargo fmt` and fix all `clippy` warnings
+5. Push your changes to your fork
+6. Submit a pull request
+
+Or, if you have any features ideas, go to the issues page and post them there
