@@ -16,7 +16,7 @@ const MAX_OPTIONS: usize = 25;
 const COLOR: Color = Color::Yellow;
 
 pub fn choose_with_images(
-    options: &Vec<String>,
+    options: &[String],
     imgs_path: Vec<String>,
     is_to_choose_media: bool,
 ) -> Result<usize, ()> {
