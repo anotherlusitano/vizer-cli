@@ -28,6 +28,7 @@ static USE_MPV: OnceLock<bool> = OnceLock::new();
 fn main() {
     let matches = Command::new("vizer-cli")
         .about("CLI tool to watch movies/series/animes in portuguese")
+        .version(env!("CARGO_PKG_VERSION"))
         .subcommand_required(true)
         .arg_required_else_help(true)
         .arg(
