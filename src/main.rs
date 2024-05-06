@@ -24,6 +24,7 @@ mod scraper;
 static TRANSLATION: OnceLock<Translations> = OnceLock::new();
 static VIM_MODE: OnceLock<bool> = OnceLock::new();
 static USE_MPV: OnceLock<bool> = OnceLock::new();
+static USE_GECKODRIVER: OnceLock<bool> = OnceLock::new();
 
 fn main() {
     let matches = Command::new("vizer-cli")
@@ -47,6 +48,15 @@ fn main() {
                 .required(false)
                 .num_args(0)
                 .help("Use MPV media player instead of VLC")
+                .action(clap::ArgAction::SetTrue),
+        )
+        .arg(
+            Arg::new("geckodriver")
+                .short('g')
+                .long("geckodriver")
+                .required(false)
+                .num_args(0)
+                .help("Use web driver for gecko based browsers like (Firefox, LibreWolf, etc)")
                 .action(clap::ArgAction::SetTrue),
         )
         .arg(
@@ -91,6 +101,12 @@ fn main() {
         TRANSLATION.get_or_init(|| get_translation("english"));
     } else {
         TRANSLATION.get_or_init(|| get_translation("portuguese"));
+    }
+
+    if matches.get_flag("geckodriver") {
+        USE_GECKODRIVER.get_or_init(|| true);
+    } else {
+        USE_GECKODRIVER.get_or_init(|| false);
     }
 
     if matches.get_flag("mpv") {
