@@ -1,5 +1,4 @@
-use std::{process::Command, thread::sleep, time::Duration};
-
+use std::{process::Command, process::Stdio, thread::sleep, time::Duration};
 use thirtyfour::prelude::*;
 
 use crate::{
@@ -11,25 +10,43 @@ use crate::{
     media::Media,
     player::mpv::open_mpv,
     player::vlc::open_vlc,
-    TRANSLATION, USE_MPV,
+    TRANSLATION, USE_GECKODRIVER, USE_MPV,
 };
 
 #[tokio::main]
 pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResult<()> {
     let language = TRANSLATION.get().unwrap();
     let use_mpv = USE_MPV.get().unwrap();
+    let use_geckodriver = USE_GECKODRIVER.get().unwrap();
 
     let url = format!("https://vizer.in/{}", &media.url);
-    let mut chromedriver = Command::new("chromedriver").spawn().unwrap();
-    // we need to wait chromedriver to start :(
+    let mut driver_command = String::new();
+    if *use_geckodriver {
+        driver_command.push_str("geckodriver");
+    } else {
+        driver_command.push_str("chromedriver");
+    };
+
+    let mut browser_driver = Command::new(driver_command)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .spawn()
+        .unwrap();
+    // we need to wait command to start :(
     sleep(Duration::from_millis(100));
 
     print!("\x1B[2J\x1B[1;1H");
     println!("{}", language.preparing_misc_text);
 
-    let mut caps = DesiredCapabilities::chrome();
-    caps.set_headless().unwrap();
-    let driver = WebDriver::new("http://localhost:9515", caps).await?;
+    let driver: WebDriver = if *use_geckodriver {
+        let mut caps = DesiredCapabilities::firefox();
+        caps.set_headless().unwrap();
+        WebDriver::new("http://localhost:4444", caps).await?
+    } else {
+        let mut caps = DesiredCapabilities::chrome();
+        caps.set_headless().unwrap();
+        WebDriver::new("http://localhost:9595", caps).await?
+    };
 
     driver.goto(url).await?;
 
@@ -172,7 +189,7 @@ pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResul
     let video_url = format!("https:{}", video.attr("src").await?.unwrap());
 
     driver.quit().await?;
-    chromedriver.kill().unwrap();
+    browser_driver.kill().unwrap();
 
     if *use_mpv {
         open_mpv(&video_url);
