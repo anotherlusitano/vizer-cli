@@ -1,6 +1,9 @@
 use crate::{choose::Choose, TRANSLATION, VIM_MODE};
 
-pub fn choose_episode(episodes: Vec<String>) -> Result<usize, ()> {
+pub fn choose_episode_with_images(
+    episodes: Vec<String>,
+    images_path: Vec<String>,
+) -> Result<usize, ()> {
     let language = TRANSLATION.get().unwrap();
     let vim_mode = VIM_MODE.get().unwrap();
     print!("\x1B[2J\x1B[1;1H");
@@ -11,6 +14,7 @@ pub fn choose_episode(episodes: Vec<String>) -> Result<usize, ()> {
         .with_help_message(&help_msg)
         .with_page_size(25)
         .with_vim_mode(*vim_mode)
+        .with_images(images_path)
         .prompt();
 
     match ans {

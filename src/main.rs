@@ -5,17 +5,16 @@ use crate::{
     fs::temp_dir::{create_temp_dir, remove_temp_dir},
 };
 use clap::{arg, Arg, Command};
-use cli::{choose_media::choose_media, choose_with_images::choose_with_images};
+use cli::{choose_media::choose_media, choose_media_with_images::choose_media_with_images};
 use fs::posters::get_posters_path;
-use inquire_style::set_inquire_style;
 use language::{get_translation, Translations};
 use player::watch_media::watch_media;
 use scraper::is_offline::is_offline;
 use tokio::runtime::Runtime;
 
+pub mod choose;
 mod cli;
 mod fs;
-mod inquire_style;
 pub mod language;
 pub mod media;
 mod player;
@@ -143,8 +142,6 @@ fn main() {
                 exit(1)
             }
 
-            set_inquire_style();
-
             if img_mode {
                 create_temp_dir();
                 let medias_poster_url: Vec<String> = medias
@@ -152,19 +149,14 @@ fn main() {
                     .into_iter()
                     .map(|media| media.poster_url)
                     .collect();
-                let medias_title: Vec<String> = medias
-                    .clone()
-                    .into_iter()
-                    .map(|media| media.title)
-                    .collect();
 
                 let rt = Runtime::new().unwrap();
                 let future = get_posters_path(medias_poster_url);
                 let posters_path = rt.block_on(future).unwrap();
 
-                match choose_with_images(&medias_title, posters_path, true) {
-                    Ok(media_index) => {
-                        watch_media(medias[media_index].clone(), Some(img_mode)).unwrap();
+                match choose_media_with_images(medias, posters_path) {
+                    Ok(media) => {
+                        watch_media(media, img_mode).unwrap();
                         remove_temp_dir();
                     }
                     Err(err) => {
@@ -175,7 +167,7 @@ fn main() {
             } else {
                 match choose_media(medias) {
                     Ok(media) => {
-                        watch_media(media, Some(img_mode)).unwrap();
+                        watch_media(media, img_mode).unwrap();
                     }
                     Err(err) => {
                         eprintln!("{:?}", err);

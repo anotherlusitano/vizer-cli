@@ -11,7 +11,6 @@ license = "GPL-3.0"
 scraper = "0.17.1"
 reqwest = { version = "0.11", features = ["blocking"] }
 clap = "4.4.4"
-inquire = "0.6.2"
 thirtyfour = "0.31.0"
 tokio = "1.32.0"
 crossterm = "0.27.0"
