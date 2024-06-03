@@ -1,6 +1,6 @@
 use crate::{choose::Choose, media::Media, TRANSLATION, VIM_MODE};
 
-pub fn choose_media(medias: Vec<Media>) -> Result<Media, ()> {
+pub fn choose_media_with_images(medias: Vec<Media>, images_path: Vec<String>) -> Result<Media, ()> {
     let language = TRANSLATION.get().unwrap();
     let vim_mode = VIM_MODE.get().unwrap();
 
@@ -17,6 +17,7 @@ pub fn choose_media(medias: Vec<Media>) -> Result<Media, ()> {
         .with_help_message(&help_msg)
         .with_page_size(25)
         .with_vim_mode(*vim_mode)
+        .with_images(images_path)
         .prompt();
 
     match ans {

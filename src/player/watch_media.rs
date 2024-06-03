@@ -3,8 +3,8 @@ use thirtyfour::prelude::*;
 
 use crate::{
     cli::{
-        choose_episode::choose_episode, choose_lang::choose_lang, choose_season::choose_season,
-        choose_with_images::choose_with_images,
+        choose_episode::choose_episode, choose_episode_with_images::choose_episode_with_images,
+        choose_lang::choose_lang, choose_season::choose_season,
     },
     fs::posters::get_posters_path,
     media::Media,
@@ -14,7 +14,7 @@ use crate::{
 };
 
 #[tokio::main]
-pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResult<()> {
+pub async fn watch_media(media: Media, img_mode: bool) -> WebDriverResult<()> {
     let language = TRANSLATION.get().unwrap();
     let use_mpv = USE_MPV.get().unwrap();
     let use_geckodriver = USE_GECKODRIVER.get().unwrap();
@@ -97,7 +97,7 @@ pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResul
 
                 episodes_opt.push(episode);
 
-                if img_mode.unwrap() {
+                if img_mode {
                     let img_src = item.find(By::Tag("img")).await?.attr("src").await?.unwrap();
                     let img_url =
                         format!("https://vizertv.in{}", img_src.replace("s/185", "s/500"));
@@ -108,12 +108,12 @@ pub async fn watch_media(media: Media, img_mode: Option<bool>) -> WebDriverResul
 
         let episode_opt: usize = if episodes_opt.len() > 1 {
             match img_mode {
-                Some(true) => {
+                true => {
                     let posters_path = get_posters_path(episodes_img_url).await.unwrap();
 
-                    choose_with_images(&episodes_opt, posters_path, false).unwrap()
+                    choose_episode_with_images(episodes_opt, posters_path).unwrap()
                 }
-                _ => choose_episode(episodes_opt).unwrap(),
+                false => choose_episode(episodes_opt).unwrap(),
             }
         } else {
             episodes_opt[0].parse::<usize>().unwrap() - 1
