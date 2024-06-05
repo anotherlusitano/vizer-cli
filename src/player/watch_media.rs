@@ -45,7 +45,7 @@ pub async fn watch_media(media: Media, img_mode: bool) -> WebDriverResult<()> {
     } else {
         let mut caps = DesiredCapabilities::chrome();
         caps.set_headless().unwrap();
-        WebDriver::new("http://localhost:9595", caps).await?
+        WebDriver::new("http://localhost:9515", caps).await?
     };
 
     driver.goto(url).await?;
