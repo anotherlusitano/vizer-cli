@@ -1,4 +1,6 @@
-use crate::{choose::Choose, media::Media, TRANSLATION, VIM_MODE};
+use selthi::Selthi;
+
+use crate::{media::Media, TRANSLATION, VIM_MODE};
 
 pub fn choose_media(medias: Vec<Media>) -> Result<Media, ()> {
     let language = TRANSLATION.get().unwrap();
@@ -12,8 +14,10 @@ pub fn choose_media(medias: Vec<Media>) -> Result<Media, ()> {
 
     let help_msg = format!("{} {}", language.total_media_misc_text, options.len());
 
+    let options = options.iter().map(String::as_str).collect();
+
     print!("\x1B[2J\x1B[1;1H");
-    let ans = Choose::new(language.select_media_misc_text, options)
+    let ans = Selthi::new(language.select_media_misc_text, options)
         .with_help_message(&help_msg)
         .with_page_size(25)
         .with_vim_mode(*vim_mode)

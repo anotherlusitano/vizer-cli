@@ -1423,6 +1423,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "selthi"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "356999770b1a03711416ea25354fc675d5fd86e42a714c1627e0551d8deb5ed4"
+dependencies = [
+ "crossterm",
+ "ueberzug",
+]
+
+[[package]]
 name = "serde"
 version = "1.0.188"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1509,9 +1519,9 @@ dependencies = [
 
 [[package]]
 name = "signal-hook-registry"
-version = "1.4.1"
+version = "1.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d8229b473baa5980ac72ef434c4415e70c4b5e71b423043adb4ba059f89c99a1"
+checksum = "a9e9e0b4211b72e7b8b6e85c807d36c212bdb33ea8587f7569562a84df5465b1"
 dependencies = [
  "libc",
 ]
@@ -1943,13 +1953,12 @@ name = "vizer-cli"
 version = "0.3.0"
 dependencies = [
  "clap",
- "crossterm",
  "futures",
  "reqwest",
  "scraper",
+ "selthi",
  "thirtyfour",
  "tokio",
- "ueberzug",
 ]
 
 [[package]]

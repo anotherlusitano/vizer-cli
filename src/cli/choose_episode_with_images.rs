@@ -1,4 +1,6 @@
-use crate::{choose::Choose, TRANSLATION, VIM_MODE};
+use selthi::Selthi;
+
+use crate::{TRANSLATION, VIM_MODE};
 
 pub fn choose_episode_with_images(
     episodes: Vec<String>,
@@ -10,7 +12,10 @@ pub fn choose_episode_with_images(
 
     let help_msg = format!("{} {}", language.total_episode_misc_text, episodes.len());
 
-    let ans = Choose::new(language.select_episode_misc_text, episodes)
+    let images_path = images_path.iter().map(String::as_str).collect();
+    let episodes = episodes.iter().map(String::as_str).collect();
+
+    let ans = Selthi::new(language.select_episode_misc_text, episodes)
         .with_help_message(&help_msg)
         .with_page_size(25)
         .with_vim_mode(*vim_mode)
