@@ -12,7 +12,6 @@ use player::watch_media::watch_media;
 use scraper::is_offline::is_offline;
 use tokio::runtime::Runtime;
 
-pub mod choose;
 mod cli;
 mod fs;
 pub mod language;
