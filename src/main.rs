@@ -13,6 +13,7 @@ use scraper::is_offline::is_offline;
 use tokio::runtime::Runtime;
 
 mod cli;
+mod driver;
 mod fs;
 pub mod language;
 pub mod media;
