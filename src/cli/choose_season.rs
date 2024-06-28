@@ -1,4 +1,4 @@
-use selthi::Selthi;
+use selthi::Select;
 
 use crate::{TRANSLATION, VIM_MODE};
 
@@ -11,7 +11,7 @@ pub fn choose_season(seasons: Vec<String>) -> Result<String, ()> {
 
     let seasons = seasons.iter().map(String::as_str).collect();
 
-    let ans = Selthi::new(language.select_season_misc_text, seasons)
+    let ans = Select::new(language.select_season_misc_text, seasons)
         .with_help_message(&help_msg)
         .with_page_size(25)
         .with_vim_mode(*vim_mode)

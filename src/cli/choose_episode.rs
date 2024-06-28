@@ -1,4 +1,4 @@
-use selthi::Selthi;
+use selthi::Select;
 
 use crate::{TRANSLATION, VIM_MODE};
 
@@ -11,7 +11,7 @@ pub fn choose_episode(episodes: Vec<String>) -> Result<usize, ()> {
 
     let episodes = episodes.iter().map(String::as_str).collect();
 
-    let ans = Selthi::new(language.select_episode_misc_text, episodes)
+    let ans = Select::new(language.select_episode_misc_text, episodes)
         .with_help_message(&help_msg)
         .with_page_size(25)
         .with_vim_mode(*vim_mode)
