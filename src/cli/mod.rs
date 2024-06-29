@@ -5,3 +5,4 @@ pub mod choose_media_with_images;
 pub mod choose_season;
 pub mod get_media_url;
 pub mod get_medias;
+pub mod get_video_url;

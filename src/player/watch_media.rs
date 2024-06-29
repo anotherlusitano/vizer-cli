@@ -3,6 +3,7 @@ use thirtyfour::prelude::*;
 use crate::{
     cli::{
         choose_episode::choose_episode, choose_season::choose_season, get_media_url::get_media_url,
+        get_video_url::get_video_url,
     },
     driver::start_driver::{get_driver, start_browser_driver},
     media::Media,
@@ -35,28 +36,7 @@ pub async fn watch_media(media: Media, img_mode: bool) -> WebDriverResult<()> {
 
     let media_url = get_media_url(&driver).await?;
 
-    driver.goto(media_url).await?;
-
-    driver.enter_frame(0).await?;
-
-    let play_button = driver
-        .query(By::ClassName("vjs-big-play-button"))
-        .first()
-        .await?;
-
-    // we execute a js script to not be redirect to other page by the pop up
-    driver
-        .execute(
-            r#"
-            arguments[0].click();
-            "#,
-            vec![play_button.to_json()?],
-        )
-        .await?;
-
-    let video = driver.find(By::Id("videojs_html5_api")).await?;
-
-    let video_url = format!("https:{}", video.attr("src").await?.unwrap());
+    let video_url = get_video_url(&driver, media_url).await?;
 
     driver.quit().await?;
     browser_driver.kill().unwrap();
