@@ -3,7 +3,7 @@ use thirtyfour::prelude::*;
 use crate::{
     cli::{
         choose_episode::choose_episode, choose_season::choose_season, get_media_url::get_media_url,
-        get_video_url::get_video_url,
+        get_video_url::get_video_url, menu::menu,
     },
     driver::start_driver::{get_driver, start_browser_driver},
     media::Media,
@@ -37,10 +37,22 @@ pub async fn watch_media(media: Media, img_mode: bool) -> WebDriverResult<()> {
 
     let video_url = get_video_url(&driver, media_url).await?;
 
+    play_video(&video_url);
+
+    loop {
+        match menu() {
+            Ok("replay") => play_video(&video_url),
+            Ok("quit") => break,
+            Err(err) => {
+                eprint!("{:?}", err);
+                break;
+            }
+            _ => break,
+        }
+    }
+
     driver.quit().await?;
     browser_driver.kill().unwrap();
-
-    play_video(&video_url);
 
     Ok(())
 }
