@@ -15,7 +15,6 @@ pub fn open_mpv(video_url: &str) {
             Ok(status) => {
                 if status.success() {
                     print!("\x1B[2J\x1B[1;1H");
-                    println!("{}", language.players_exit_misc_text);
                 } else {
                     println!("{} {:?}", language.mpv_exit_with_err, status.code());
                 }

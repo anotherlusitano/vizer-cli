@@ -52,7 +52,6 @@ pub struct Translations {
     //=====# vlc.rs translations #=====//
     //misc text
     pub players_start_misc_text: &'static str,
-    pub players_exit_misc_text: &'static str,
     // err text
     pub vlc_exit_with_err: &'static str,
     pub vlc_wait_err: &'static str,
@@ -128,7 +127,6 @@ const PORTUGUESE: Translations = Translations {
     //=====# vlc.rs translations #=====//
     //misc text
     players_start_misc_text: "Iniciando o reprodutor de mídia",
-    players_exit_misc_text: "Tchau Tchau (^_^)/",
     // err text
     vlc_exit_with_err: "VLC fechou com um erro:",
     vlc_wait_err: "Falha ao esperar por VLC:",
@@ -204,7 +202,6 @@ const ENGLISH: Translations = Translations {
     //=====# vlc.rs && mpv.rs translations #=====//
     // (vlc.rs && mpv.rs) misc text
     players_start_misc_text: "Starting the player",
-    players_exit_misc_text: "Bye bye (^_^)/",
     // vlc.rs err text
     vlc_exit_with_err: "VLC exited with an error:",
     vlc_wait_err: "Failed to wait for VLC:",
