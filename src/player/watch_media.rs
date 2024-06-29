@@ -7,14 +7,13 @@ use crate::{
     },
     driver::start_driver::{get_driver, start_browser_driver},
     media::Media,
-    player::{mpv::open_mpv, vlc::open_vlc},
-    TRANSLATION, USE_MPV,
+    player::play_video::play_video,
+    TRANSLATION,
 };
 
 #[tokio::main]
 pub async fn watch_media(media: Media, img_mode: bool) -> WebDriverResult<()> {
     let language = TRANSLATION.get().unwrap();
-    let use_mpv = USE_MPV.get().unwrap();
 
     print!("\x1B[2J\x1B[1;1H");
     println!("{}", language.preparing_misc_text);
@@ -41,11 +40,7 @@ pub async fn watch_media(media: Media, img_mode: bool) -> WebDriverResult<()> {
     driver.quit().await?;
     browser_driver.kill().unwrap();
 
-    if *use_mpv {
-        open_mpv(&video_url);
-    } else {
-        open_vlc(&video_url);
-    }
+    play_video(&video_url);
 
     Ok(())
 }
