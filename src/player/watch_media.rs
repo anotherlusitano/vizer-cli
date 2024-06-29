@@ -1,12 +1,8 @@
 use thirtyfour::prelude::*;
 
 use crate::{
-    cli::{
-        choose_episode::choose_episode, choose_episode_with_images::choose_episode_with_images,
-        choose_lang::choose_lang, choose_season::choose_season,
-    },
+    cli::{choose_episode::choose_episode, choose_lang::choose_lang, choose_season::choose_season},
     driver::start_driver::{get_driver, start_browser_driver},
-    fs::posters::get_posters_path,
     media::Media,
     player::{mpv::open_mpv, vlc::open_vlc},
     TRANSLATION, USE_MPV,
@@ -32,54 +28,7 @@ pub async fn watch_media(media: Media, img_mode: bool) -> WebDriverResult<()> {
 
         println!("{}", language.getting_episodes_misc_text);
 
-        let episodes_list = driver.find(By::ClassName("episodes")).await?;
-
-        let episodes_items = episodes_list.query(By::ClassName("item")).all().await?;
-
-        let mut episodes_opt: Vec<String> = Vec::new();
-        let mut episodes_img_url: Vec<String> = Vec::new();
-
-        for (i, item) in episodes_items.iter().enumerate() {
-            if item.class_name().await?.unwrap() != "item unreleased " {
-                let episode_text = item.find(By::Tag("span")).await?.inner_html().await?;
-                // this thing of adding by 1
-                // is just to show the episodes starting in 1
-                let episode: String = format!("{} - {}", i + 1, episode_text);
-
-                episodes_opt.push(episode);
-
-                if img_mode {
-                    let img_src = item.find(By::Tag("img")).await?.attr("src").await?.unwrap();
-                    let img_url =
-                        format!("https://vizertv.in{}", img_src.replace("s/185", "s/500"));
-                    episodes_img_url.push(img_url);
-                }
-            }
-        }
-
-        let episode_opt: usize = if episodes_opt.len() > 1 {
-            match img_mode {
-                true => {
-                    let posters_path = get_posters_path(episodes_img_url).await.unwrap();
-
-                    choose_episode_with_images(episodes_opt, posters_path).unwrap()
-                }
-                false => choose_episode(episodes_opt).unwrap(),
-            }
-        } else {
-            episodes_opt[0].parse::<usize>().unwrap() - 1
-        };
-
-        // we execute a js script to not be redirect to other page by the pop up
-        driver
-            .execute(
-                r#"
-            arguments[0].click();
-            "#,
-                vec![episodes_items[episode_opt].to_json()?],
-            )
-            .await
-            .expect(language.click_episode_err);
+        choose_episode(&driver, img_mode).await?;
     }
 
     println!("{}", language.getting_language_misc_text);
