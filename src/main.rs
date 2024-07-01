@@ -5,7 +5,7 @@ use crate::{
     fs::temp_dir::{create_temp_dir, remove_temp_dir},
 };
 use clap::{arg, Arg, Command};
-use cli::{choose_media::choose_media, choose_media_with_images::choose_media_with_images};
+use cli::choose_media::choose_media;
 use fs::posters::get_posters_path;
 use language::{get_translation, Translations};
 use player::watch_media::watch_media;
@@ -142,6 +142,8 @@ fn main() {
                 exit(1)
             }
 
+            let mut posters_path: Vec<String> = Vec::new();
+
             if img_mode {
                 create_temp_dir();
                 let medias_poster_url: Vec<String> = medias
@@ -152,26 +154,16 @@ fn main() {
 
                 let rt = Runtime::new().unwrap();
                 let future = get_posters_path(medias_poster_url);
-                let posters_path = rt.block_on(future).unwrap();
-
-                match choose_media_with_images(medias, posters_path) {
-                    Ok(media) => {
-                        watch_media(media, img_mode).unwrap();
-                        remove_temp_dir();
-                    }
-                    Err(err) => {
-                        remove_temp_dir();
-                        eprintln!("{:?}", err);
-                    }
+                posters_path = rt.block_on(future).unwrap();
+            }
+            match choose_media(medias, img_mode, posters_path) {
+                Ok(media) => {
+                    watch_media(media, img_mode).unwrap();
+                    remove_temp_dir();
                 }
-            } else {
-                match choose_media(medias) {
-                    Ok(media) => {
-                        watch_media(media, img_mode).unwrap();
-                    }
-                    Err(err) => {
-                        eprintln!("{:?}", err);
-                    }
+                Err(err) => {
+                    eprintln!("{:?}", err);
+                    remove_temp_dir();
                 }
             }
         }
