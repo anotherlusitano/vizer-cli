@@ -1,6 +1,10 @@
 use thirtyfour::prelude::*;
 
+use crate::{driver::click_element::click_element, TRANSLATION};
+
 pub async fn get_video_url(driver: &WebDriver, media_url: String) -> WebDriverResult<String> {
+    let language = TRANSLATION.get().unwrap();
+
     driver.goto(media_url).await?;
 
     driver.enter_frame(0).await?;
@@ -10,15 +14,7 @@ pub async fn get_video_url(driver: &WebDriver, media_url: String) -> WebDriverRe
         .first()
         .await?;
 
-    // we execute a js script to not be redirect to other page by the pop up
-    driver
-        .execute(
-            r#"
-            arguments[0].click();
-            "#,
-            vec![play_button.to_json()?],
-        )
-        .await?;
+    click_element(driver, play_button, language.click_episode_err).await?;
 
     let video = driver.find(By::Id("videojs_html5_api")).await?;
 

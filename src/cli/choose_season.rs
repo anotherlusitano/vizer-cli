@@ -1,7 +1,7 @@
 use selthi::Select;
 use thirtyfour::prelude::*;
 
-use crate::{TRANSLATION, VIM_MODE};
+use crate::{driver::click_element::click_element, TRANSLATION, VIM_MODE};
 
 pub async fn choose_season(driver: &WebDriver) -> WebDriverResult<()> {
     let language = TRANSLATION.get().unwrap();
@@ -22,16 +22,7 @@ pub async fn choose_season(driver: &WebDriver) -> WebDriverResult<()> {
     let season_btn_xpath = format!("//div[text()='{}']", season_opt);
     let season_element = driver.query(By::XPath(&season_btn_xpath)).first().await?;
 
-    // we execute a js script to not be redirect to other page by the pop up
-    driver
-        .execute(
-            r#"
-            arguments[0].click();
-            "#,
-            vec![season_element.to_json()?],
-        )
-        .await
-        .expect(language.click_season_err);
+    click_element(driver, season_element, language.click_season_err).await?;
 
     Ok(())
 }

@@ -1,7 +1,9 @@
 use selthi::Select;
 use thirtyfour::prelude::*;
 
-use crate::{fs::posters::get_posters_path, TRANSLATION, VIM_MODE};
+use crate::{
+    driver::click_element::click_element, fs::posters::get_posters_path, TRANSLATION, VIM_MODE,
+};
 
 pub async fn choose_episode(driver: &WebDriver, img_mode: bool) -> WebDriverResult<()> {
     let episodes_list = driver.find(By::ClassName("episodes")).await?;
@@ -44,16 +46,12 @@ pub async fn choose_episode(driver: &WebDriver, img_mode: bool) -> WebDriverResu
         episodes_opt[0].parse::<usize>().unwrap() - 1
     };
 
-    // we execute a js script to not be redirect to other page by the pop up
-    driver
-        .execute(
-            r#"
-            arguments[0].click();
-            "#,
-            vec![episodes_items[episode_opt].to_json()?],
-        )
-        .await
-        .expect(language.click_episode_err);
+    click_element(
+        driver,
+        episodes_items[episode_opt].clone(),
+        language.click_episode_err,
+    )
+    .await?;
 
     Ok(())
 }

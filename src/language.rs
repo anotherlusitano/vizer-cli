@@ -69,6 +69,7 @@ pub struct Translations {
     //err text
     pub click_season_err: &'static str,
     pub click_episode_err: &'static str,
+    pub click_play_button_err: &'static str,
     //expect text
     pub language_option_expect: &'static str,
 }
@@ -144,6 +145,7 @@ const PORTUGUESE: Translations = Translations {
     //err text
     click_season_err: "Erro: Não é possível clicar na temporada",
     click_episode_err: "Erro: Não é possível clicar no episódio",
+    click_play_button_err: "Erro: Não é possível clicar no botão de play",
     //expect text
     language_option_expect: "Não foi possível adquirir opções de linguagens.",
 };
@@ -220,6 +222,7 @@ const ENGLISH: Translations = Translations {
     //err text
     click_season_err: "Error: Can't click on the season",
     click_episode_err: "Error: Can't click on the episode",
+    click_play_button_err: "Error: Can't click on the play button",
     //expect text
     language_option_expect: "Couldn't retrieve languages options.",
 };
