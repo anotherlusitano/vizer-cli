@@ -6,6 +6,7 @@ use crate::{
         get_media_name_from_user::get_media_name_from_user, get_media_url::get_media_url,
         get_medias::get_medias, get_video_url::get_video_url, menu::menu,
     },
+    driver::parse_seasons::parse_seasons,
     fs::posters::get_posters_path,
     media::Media,
     player::play_video::play_video,
@@ -22,7 +23,20 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
     driver.goto(url).await?;
 
     if media.url.contains("serie/") {
-        choose_season(driver).await?;
+        let seasons = parse_seasons(driver).await?;
+
+        let season_opts: Vec<&str> = seasons.iter().map(|s| s.text.as_str()).collect();
+
+        let season_opt = if season_opts.len() > 1 {
+            choose_season(season_opts.clone()).unwrap()
+        } else {
+            0
+        };
+
+        seasons[season_opt]
+            .clone()
+            .click_season(driver, language.click_season_err)
+            .await?;
 
         println!("{}", language.getting_episodes_misc_text);
 
@@ -66,7 +80,21 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
                         driver.goto(url).await?;
 
                         if media.url.contains("serie/") {
-                            choose_season(driver).await?;
+                            let seasons = parse_seasons(driver).await?;
+
+                            let season_opts: Vec<&str> =
+                                seasons.iter().map(|s| s.text.as_str()).collect();
+
+                            let season_opt = if season_opts.len() > 1 {
+                                choose_season(season_opts.clone()).unwrap()
+                            } else {
+                                0
+                            };
+
+                            seasons[season_opt]
+                                .clone()
+                                .click_season(driver, language.click_season_err)
+                                .await?;
 
                             println!("{}", language.getting_episodes_misc_text);
 
