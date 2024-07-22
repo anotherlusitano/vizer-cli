@@ -19,6 +19,7 @@ pub mod language;
 pub mod media;
 mod player;
 mod scraper;
+pub mod season;
 
 static TRANSLATION: OnceLock<Translations> = OnceLock::new();
 static VIM_MODE: OnceLock<bool> = OnceLock::new();
