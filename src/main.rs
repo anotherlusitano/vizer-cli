@@ -14,6 +14,7 @@ use scraper::is_offline::is_offline;
 
 mod cli;
 mod driver;
+pub mod episode;
 mod fs;
 pub mod language;
 pub mod media;
