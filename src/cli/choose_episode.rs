@@ -34,13 +34,16 @@ pub async fn choose_episode(driver: &WebDriver, img_mode: bool) -> WebDriverResu
     let language = TRANSLATION.get().unwrap();
 
     let episode_opt: usize = if episodes_opt.len() > 1 {
+        let episodes_opt = episodes_opt.iter().map(String::as_str).collect();
+
         match img_mode {
             true => {
                 let posters_path = get_posters_path(episodes_img_url).await.unwrap();
+                let posters_path = posters_path.iter().map(String::as_str).collect();
 
-                get_episode_with_images(episodes_opt, posters_path).unwrap()
+                get_episode(episodes_opt, Some(posters_path)).unwrap()
             }
-            false => get_episode(episodes_opt).unwrap(),
+            false => get_episode(episodes_opt, None).unwrap(),
         }
     } else {
         episodes_opt[0].parse::<usize>().unwrap() - 1
@@ -56,49 +59,27 @@ pub async fn choose_episode(driver: &WebDriver, img_mode: bool) -> WebDriverResu
     Ok(())
 }
 
-fn get_episode(episodes: Vec<String>) -> Result<usize, ()> {
+fn get_episode(episodes: Vec<&str>, images_path: Option<Vec<&str>>) -> Result<usize, ()> {
     let language = TRANSLATION.get().unwrap();
     let vim_mode = VIM_MODE.get().unwrap();
     print!("\x1B[2J\x1B[1;1H");
 
     let help_msg = format!("{} {}", language.total_episode_misc_text, episodes.len());
 
-    let episodes = episodes.iter().map(String::as_str).collect();
-
-    let ans = Select::new(language.select_episode_misc_text, episodes)
-        .with_help_message(&help_msg)
-        .with_page_size(25)
-        .with_vim_mode(*vim_mode)
-        .prompt();
-
-    match ans {
-        Some(choice) => {
-            let mut episode_number = choice.split_whitespace();
-
-            let episode: usize = episode_number.next().unwrap().parse::<usize>().unwrap() - 1;
-
-            Ok(episode)
-        }
-        None => Err(println!("{}", language.choose_episode_err)),
-    }
-}
-
-fn get_episode_with_images(episodes: Vec<String>, images_path: Vec<String>) -> Result<usize, ()> {
-    let language = TRANSLATION.get().unwrap();
-    let vim_mode = VIM_MODE.get().unwrap();
-    print!("\x1B[2J\x1B[1;1H");
-
-    let help_msg = format!("{} {}", language.total_episode_misc_text, episodes.len());
-
-    let images_path = images_path.iter().map(String::as_str).collect();
-    let episodes = episodes.iter().map(String::as_str).collect();
-
-    let ans = Select::new(language.select_episode_misc_text, episodes)
-        .with_help_message(&help_msg)
-        .with_page_size(25)
-        .with_vim_mode(*vim_mode)
-        .with_images(images_path)
-        .prompt();
+    let ans = if let Some(images_path) = images_path {
+        Select::new(language.select_episode_misc_text, episodes)
+            .with_help_message(&help_msg)
+            .with_page_size(25)
+            .with_vim_mode(*vim_mode)
+            .with_images(images_path)
+            .prompt()
+    } else {
+        Select::new(language.select_episode_misc_text, episodes)
+            .with_help_message(&help_msg)
+            .with_page_size(25)
+            .with_vim_mode(*vim_mode)
+            .prompt()
+    };
 
     match ans {
         Some(choice) => {
