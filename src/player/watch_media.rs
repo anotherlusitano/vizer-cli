@@ -6,7 +6,7 @@ use crate::{
         get_media_name_from_user::get_media_name_from_user, get_media_url::get_media_url,
         get_medias::get_medias, get_video_url::get_video_url, menu::menu,
     },
-    driver::parse_seasons::parse_seasons,
+    driver::{parse_episodes::parse_episodes, parse_seasons::parse_seasons},
     fs::posters::get_posters_path,
     media::Media,
     player::play_video::play_video,
@@ -40,7 +40,29 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
 
         println!("{}", language.getting_episodes_misc_text);
 
-        choose_episode(driver, img_mode).await?;
+        let episodes = parse_episodes(driver, img_mode).await?;
+
+        let episode_opts: Vec<&str> = episodes.iter().map(|s| s.text.as_str()).collect();
+
+        let episode_opt = if episode_opts.len() > 1 {
+            if episodes[0].img_path.is_some() {
+                let episodes_img_path = episodes
+                    .iter()
+                    .map(|i| i.img_path.as_ref().unwrap().as_str())
+                    .collect();
+
+                choose_episode(episode_opts.clone(), Some(episodes_img_path)).unwrap()
+            } else {
+                choose_episode(episode_opts.clone(), None).unwrap()
+            }
+        } else {
+            0
+        };
+
+        episodes[episode_opt]
+            .clone()
+            .click_episode(driver, language.click_episode_err)
+            .await?;
     }
 
     let media_url = get_media_url(driver).await?;
@@ -98,7 +120,31 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
 
                             println!("{}", language.getting_episodes_misc_text);
 
-                            choose_episode(driver, img_mode).await?;
+                            let episodes = parse_episodes(driver, img_mode).await?;
+
+                            let episode_opts: Vec<&str> =
+                                episodes.iter().map(|s| s.text.as_str()).collect();
+
+                            let episode_opt = if episode_opts.len() > 1 {
+                                if episodes[0].img_path.is_some() {
+                                    let episodes_img_path = episodes
+                                        .iter()
+                                        .map(|i| i.img_path.as_ref().unwrap().as_str())
+                                        .collect();
+
+                                    choose_episode(episode_opts.clone(), Some(episodes_img_path))
+                                        .unwrap()
+                                } else {
+                                    choose_episode(episode_opts.clone(), None).unwrap()
+                                }
+                            } else {
+                                0
+                            };
+
+                            episodes[episode_opt]
+                                .clone()
+                                .click_episode(driver, language.click_episode_err)
+                                .await?;
                         }
 
                         let media_url = get_media_url(driver).await?;
