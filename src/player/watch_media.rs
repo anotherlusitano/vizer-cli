@@ -2,9 +2,14 @@ use thirtyfour::prelude::*;
 
 use crate::{
     cli::{
-        choose_episode::choose_episode, choose_media::choose_media, choose_season::choose_season,
-        get_media_name_from_user::get_media_name_from_user, get_media_url::get_media_url,
-        get_medias::get_medias, get_video_url::get_video_url, menu::menu,
+        choose_episode::choose_episode,
+        choose_media::choose_media,
+        choose_season::choose_season,
+        get_media_name_from_user::get_media_name_from_user,
+        get_media_url::get_media_url,
+        get_medias::get_medias,
+        get_video_url::get_video_url,
+        menu::{get_menu_options, menu},
     },
     driver::{parse_episodes::parse_episodes, parse_seasons::parse_seasons},
     fs::posters::get_posters_path,
@@ -15,6 +20,10 @@ use crate::{
 
 pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> WebDriverResult<()> {
     let language = TRANSLATION.get().unwrap();
+    let mut seasons = Vec::new();
+    let mut episodes = Vec::new();
+    let mut current_season: usize = 0;
+    let mut current_episode: usize = 0;
 
     print!("\x1B[2J\x1B[1;1H");
     println!("{}", language.preparing_misc_text);
@@ -23,28 +32,28 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
     driver.goto(url).await?;
 
     if media.url.contains("serie/") {
-        let seasons = parse_seasons(driver).await?;
+        seasons = parse_seasons(driver).await?;
 
         let season_opts: Vec<&str> = seasons.iter().map(|s| s.text.as_str()).collect();
 
-        let season_opt = if season_opts.len() > 1 {
+        current_season = if season_opts.len() > 1 {
             choose_season(season_opts.clone()).unwrap()
         } else {
             0
         };
 
-        seasons[season_opt]
+        seasons[current_season]
             .clone()
             .click_season(driver, language.click_season_err)
             .await?;
 
         println!("{}", language.getting_episodes_misc_text);
 
-        let episodes = parse_episodes(driver, img_mode).await?;
+        episodes = parse_episodes(driver, img_mode).await?;
 
         let episode_opts: Vec<&str> = episodes.iter().map(|s| s.text.as_str()).collect();
 
-        let episode_opt = if episode_opts.len() > 1 {
+        current_episode = if episode_opts.len() > 1 {
             if episodes[0].img_path.is_some() {
                 let episodes_img_path = episodes
                     .iter()
@@ -59,7 +68,7 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
             0
         };
 
-        episodes[episode_opt]
+        episodes[current_episode]
             .clone()
             .click_episode(driver, language.click_episode_err)
             .await?;
@@ -72,7 +81,9 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
     play_video(&video_url);
 
     loop {
-        match menu() {
+        let menu_options = get_menu_options(&seasons, &episodes, current_episode);
+
+        match menu(menu_options) {
             Ok("replay") => play_video(&video_url),
             Ok("quit") => break,
             Ok("search") => {
@@ -102,30 +113,30 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
                         driver.goto(url).await?;
 
                         if media.url.contains("serie/") {
-                            let seasons = parse_seasons(driver).await?;
+                            seasons = parse_seasons(driver).await?;
 
                             let season_opts: Vec<&str> =
                                 seasons.iter().map(|s| s.text.as_str()).collect();
 
-                            let season_opt = if season_opts.len() > 1 {
+                            current_season = if season_opts.len() > 1 {
                                 choose_season(season_opts.clone()).unwrap()
                             } else {
                                 0
                             };
 
-                            seasons[season_opt]
+                            seasons[current_season]
                                 .clone()
                                 .click_season(driver, language.click_season_err)
                                 .await?;
 
                             println!("{}", language.getting_episodes_misc_text);
 
-                            let episodes = parse_episodes(driver, img_mode).await?;
+                            episodes = parse_episodes(driver, img_mode).await?;
 
                             let episode_opts: Vec<&str> =
                                 episodes.iter().map(|s| s.text.as_str()).collect();
 
-                            let episode_opt = if episode_opts.len() > 1 {
+                            current_episode = if episode_opts.len() > 1 {
                                 if episodes[0].img_path.is_some() {
                                     let episodes_img_path = episodes
                                         .iter()
@@ -141,10 +152,13 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
                                 0
                             };
 
-                            episodes[episode_opt]
+                            episodes[current_episode]
                                 .clone()
                                 .click_episode(driver, language.click_episode_err)
                                 .await?;
+                        } else {
+                            seasons.clear();
+                            episodes.clear();
                         }
 
                         let media_url = get_media_url(driver).await?;
