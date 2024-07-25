@@ -15,6 +15,7 @@ A cli tool to watch movies/series/animes in portuguese. This tool scrapes the si
 ## Table of Contents
 
 - [Dependencies](#dependencies)
+- [Installation](#installation)
 - [Usage](#usage)
 - [Contributing](#contributing)
 
@@ -24,6 +25,18 @@ A cli tool to watch movies/series/animes in portuguese. This tool scrapes the si
 - [vlc](https://www.videolan.org/vlc/)
 - [chromedriver](https://chromedriver.chromium.org/downloads)
 - [ueberzugpp](https://github.com/jstkdng/ueberzugpp)
+
+## Installation
+
+For now, the only installation method is to compile from source.
+
+```sh
+git clone https://github.com/anotherlusitano/vizer-cli.git
+cd vizer-cli/
+cargo build --release
+```
+
+After that, you will have the program executable in `./target/release/`
 
 ## Usage
 
