@@ -138,6 +138,44 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
 
                 play_video(&video_url);
             }
+            Ok("select episode") => {
+                driver.back().await?;
+
+                seasons = parse_seasons(driver).await?;
+
+                seasons[current_season]
+                    .clone()
+                    .click_season(driver, language.click_season_err)
+                    .await?;
+
+                println!("{}", language.getting_episodes_misc_text);
+
+                episodes = parse_episodes(driver, img_mode).await?;
+
+                let episode_opts: Vec<&str> = episodes.iter().map(|s| s.text.as_str()).collect();
+
+                current_episode = if episodes[0].img_path.is_some() {
+                    let episodes_img_path = episodes
+                        .iter()
+                        .map(|i| i.img_path.as_ref().unwrap().as_str())
+                        .collect();
+
+                    choose_episode(episode_opts.clone(), Some(episodes_img_path)).unwrap()
+                } else {
+                    choose_episode(episode_opts.clone(), None).unwrap()
+                };
+
+                episodes[current_episode]
+                    .clone()
+                    .click_episode(driver, language.click_episode_err)
+                    .await?;
+
+                let media_url = get_media_url(driver).await?;
+
+                video_url = get_video_url(driver, media_url).await?;
+
+                play_video(&video_url);
+            }
             Ok("search") => {
                 let mut posters_path: Vec<String> = Vec::new();
 
