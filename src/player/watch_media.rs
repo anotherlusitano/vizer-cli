@@ -11,14 +11,18 @@ use crate::{
         get_video_url::get_video_url,
         menu::{get_menu_message, get_menu_options, menu},
     },
-    driver::{parse_episodes::parse_episodes, parse_seasons::parse_seasons},
+    driver::{
+        parse_episodes::parse_episodes,
+        parse_seasons::parse_seasons,
+        start_driver::{get_driver, start_browser_driver},
+    },
     fs::posters::get_posters_path,
     media::Media,
     player::play_video::play_video,
     TRANSLATION,
 };
 
-pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> WebDriverResult<()> {
+pub async fn watch_media(media: Media, img_mode: bool) -> WebDriverResult<()> {
     let language = TRANSLATION.get().unwrap();
     let mut seasons = Vec::new();
     let mut episodes = Vec::new();
@@ -29,11 +33,14 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
     print!("\x1B[2J\x1B[1;1H");
     println!("{}", language.preparing_misc_text);
 
+    let mut browser_driver = start_browser_driver();
+    let driver = get_driver().await;
+
     let url = format!("https://vizer.in/{}", &media.url);
     driver.goto(url).await?;
 
     if media.url.contains("serie/") {
-        seasons = parse_seasons(driver).await?;
+        seasons = parse_seasons(&driver).await?;
 
         let season_opts: Vec<&str> = seasons.iter().map(|s| s.text.as_str()).collect();
 
@@ -45,12 +52,12 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
 
         seasons[current_season]
             .clone()
-            .click_season(driver, language.click_season_err)
+            .click_season(&driver, language.click_season_err)
             .await?;
 
         println!("{}", language.getting_episodes_misc_text);
 
-        episodes = parse_episodes(driver, img_mode).await?;
+        episodes = parse_episodes(&driver, img_mode).await?;
 
         let episode_opts: Vec<&str> = episodes.iter().map(|s| s.text.as_str()).collect();
 
@@ -71,13 +78,13 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
 
         episodes[current_episode]
             .clone()
-            .click_episode(driver, language.click_episode_err)
+            .click_episode(&driver, language.click_episode_err)
             .await?;
     }
 
-    let media_url = get_media_url(driver).await?;
+    let media_url = get_media_url(&driver).await?;
 
-    let mut video_url = get_video_url(driver, media_url).await?;
+    let mut video_url = get_video_url(&driver, media_url).await?;
 
     play_video(&video_url);
 
@@ -92,68 +99,68 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
             Ok("next") => {
                 driver.back().await?;
 
-                seasons = parse_seasons(driver).await?;
+                seasons = parse_seasons(&driver).await?;
 
                 seasons[current_season]
                     .clone()
-                    .click_season(driver, language.click_season_err)
+                    .click_season(&driver, language.click_season_err)
                     .await?;
 
                 println!("{}", language.getting_episodes_misc_text);
 
-                episodes = parse_episodes(driver, img_mode).await?;
+                episodes = parse_episodes(&driver, img_mode).await?;
                 current_episode += 1;
 
                 episodes[current_episode]
                     .clone()
-                    .click_episode(driver, language.click_episode_err)
+                    .click_episode(&driver, language.click_episode_err)
                     .await?;
 
-                let media_url = get_media_url(driver).await?;
+                let media_url = get_media_url(&driver).await?;
 
-                video_url = get_video_url(driver, media_url).await?;
+                video_url = get_video_url(&driver, media_url).await?;
 
                 play_video(&video_url);
             }
             Ok("previous") => {
                 driver.back().await?;
 
-                seasons = parse_seasons(driver).await?;
+                seasons = parse_seasons(&driver).await?;
 
                 seasons[current_season]
                     .clone()
-                    .click_season(driver, language.click_season_err)
+                    .click_season(&driver, language.click_season_err)
                     .await?;
 
                 println!("{}", language.getting_episodes_misc_text);
 
-                episodes = parse_episodes(driver, img_mode).await?;
+                episodes = parse_episodes(&driver, img_mode).await?;
                 current_episode -= 1;
 
                 episodes[current_episode]
                     .clone()
-                    .click_episode(driver, language.click_episode_err)
+                    .click_episode(&driver, language.click_episode_err)
                     .await?;
 
-                let media_url = get_media_url(driver).await?;
+                let media_url = get_media_url(&driver).await?;
 
-                video_url = get_video_url(driver, media_url).await?;
+                video_url = get_video_url(&driver, media_url).await?;
 
                 play_video(&video_url);
             }
             Ok("select episode") => {
                 driver.back().await?;
 
-                seasons = parse_seasons(driver).await?;
+                seasons = parse_seasons(&driver).await?;
 
                 seasons[current_season]
                     .clone()
-                    .click_season(driver, language.click_season_err)
+                    .click_season(&driver, language.click_season_err)
                     .await?;
 
                 println!("{}", language.getting_episodes_misc_text);
 
-                episodes = parse_episodes(driver, img_mode).await?;
+                episodes = parse_episodes(&driver, img_mode).await?;
 
                 let episode_opts: Vec<&str> = episodes.iter().map(|s| s.text.as_str()).collect();
 
@@ -170,19 +177,19 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
 
                 episodes[current_episode]
                     .clone()
-                    .click_episode(driver, language.click_episode_err)
+                    .click_episode(&driver, language.click_episode_err)
                     .await?;
 
-                let media_url = get_media_url(driver).await?;
+                let media_url = get_media_url(&driver).await?;
 
-                video_url = get_video_url(driver, media_url).await?;
+                video_url = get_video_url(&driver, media_url).await?;
 
                 play_video(&video_url);
             }
             Ok("select season") => {
                 driver.back().await?;
 
-                seasons = parse_seasons(driver).await?;
+                seasons = parse_seasons(&driver).await?;
 
                 let season_opts: Vec<&str> = seasons.iter().map(|s| s.text.as_str()).collect();
 
@@ -190,12 +197,12 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
 
                 seasons[current_season]
                     .clone()
-                    .click_season(driver, language.click_season_err)
+                    .click_season(&driver, language.click_season_err)
                     .await?;
 
                 println!("{}", language.getting_episodes_misc_text);
 
-                episodes = parse_episodes(driver, img_mode).await?;
+                episodes = parse_episodes(&driver, img_mode).await?;
 
                 let episode_opts: Vec<&str> = episodes.iter().map(|s| s.text.as_str()).collect();
 
@@ -216,12 +223,12 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
 
                 episodes[current_episode]
                     .clone()
-                    .click_episode(driver, language.click_episode_err)
+                    .click_episode(&driver, language.click_episode_err)
                     .await?;
 
-                let media_url = get_media_url(driver).await?;
+                let media_url = get_media_url(&driver).await?;
 
-                video_url = get_video_url(driver, media_url).await?;
+                video_url = get_video_url(&driver, media_url).await?;
 
                 play_video(&video_url);
             }
@@ -254,7 +261,7 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
                         media_name = media.title;
 
                         if media.url.contains("serie/") {
-                            seasons = parse_seasons(driver).await?;
+                            seasons = parse_seasons(&driver).await?;
 
                             let season_opts: Vec<&str> =
                                 seasons.iter().map(|s| s.text.as_str()).collect();
@@ -267,12 +274,12 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
 
                             seasons[current_season]
                                 .clone()
-                                .click_season(driver, language.click_season_err)
+                                .click_season(&driver, language.click_season_err)
                                 .await?;
 
                             println!("{}", language.getting_episodes_misc_text);
 
-                            episodes = parse_episodes(driver, img_mode).await?;
+                            episodes = parse_episodes(&driver, img_mode).await?;
 
                             let episode_opts: Vec<&str> =
                                 episodes.iter().map(|s| s.text.as_str()).collect();
@@ -295,32 +302,38 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
 
                             episodes[current_episode]
                                 .clone()
-                                .click_episode(driver, language.click_episode_err)
+                                .click_episode(&driver, language.click_episode_err)
                                 .await?;
                         } else {
                             seasons.clear();
                             episodes.clear();
                         }
 
-                        let media_url = get_media_url(driver).await?;
+                        let media_url = get_media_url(&driver).await?;
 
-                        video_url = get_video_url(driver, media_url).await?;
+                        video_url = get_video_url(&driver, media_url).await?;
 
                         play_video(&video_url);
                     }
                     Err(err) => {
                         eprintln!("{:?}", err);
+                        driver.to_owned().quit().await.unwrap();
+                        browser_driver.kill().unwrap();
                         break;
                     }
                 }
             }
             Err(err) => {
                 eprint!("{:?}", err);
+                driver.to_owned().quit().await.unwrap();
+                browser_driver.kill().unwrap();
                 break;
             }
             _ => break,
         }
     }
 
+    driver.quit().await.unwrap();
+    browser_driver.kill().unwrap();
     Ok(())
 }
