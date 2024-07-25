@@ -1,5 +1,5 @@
 <h3 align="center">
-A cli tool to watch movies/series/animes in portuguese. This tool scrapes the site <a href="https://vizer.in">vizer</a>
+A cli tool to watch movies/series/animes in portuguese. This tool scrapes the site <a href="https://vizertv.in">vizertv</a>
 </h3>
 <br>
 
