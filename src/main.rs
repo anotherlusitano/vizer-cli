@@ -6,7 +6,6 @@ use crate::{
 };
 use clap::{arg, Arg, Command};
 use cli::choose_media::choose_media;
-use driver::start_driver::{get_driver, start_browser_driver};
 use fs::posters::get_posters_path;
 use language::{get_translation, Translations};
 use player::watch_media::watch_media;
@@ -145,10 +144,6 @@ async fn main() {
                 exit(1)
             }
 
-            let mut browser_driver = start_browser_driver();
-
-            let driver = get_driver().await;
-
             let mut posters_path: Vec<String> = Vec::new();
 
             if img_mode {
@@ -163,15 +158,11 @@ async fn main() {
             }
             match choose_media(medias, img_mode, posters_path) {
                 Ok(media) => {
-                    watch_media(media, img_mode, &driver).await.unwrap();
+                    watch_media(media, img_mode).await.unwrap();
                     remove_temp_dir();
-                    driver.quit().await.unwrap();
-                    browser_driver.kill().unwrap();
                 }
                 Err(err) => {
                     eprintln!("{:?}", err);
-                    driver.quit().await.unwrap();
-                    browser_driver.kill().unwrap();
 
                     remove_temp_dir();
                 }
