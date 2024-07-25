@@ -40,6 +40,7 @@ pub async fn parse_episodes(driver: &WebDriver, img_mode: bool) -> WebDriverResu
             let episode = Episode {
                 text,
                 img_path,
+                episode_number: i,
                 web_element: episode_element.to_owned(),
             };
 

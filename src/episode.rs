@@ -6,6 +6,7 @@ use crate::driver::click_element::click_element;
 pub struct Episode {
     pub text: String,
     pub img_path: Option<String>,
+    pub episode_number: usize,
     pub web_element: WebElement,
 }
 
