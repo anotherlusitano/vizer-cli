@@ -8,6 +8,9 @@ pub async fn parse_episodes(driver: &WebDriver, img_mode: bool) -> WebDriverResu
     let episodes_items = episodes_list.query(By::ClassName("item")).all().await?;
 
     let mut episodes = Vec::new();
+    let mut list_of_images_url = Vec::new();
+    let mut list_of_episodes_text = Vec::new();
+    let mut list_of_episodes_elements = Vec::new();
 
     for (i, episode_element) in episodes_items.iter().enumerate() {
         if episode_element.class_name().await?.unwrap() != "item unreleased " {
@@ -21,7 +24,8 @@ pub async fn parse_episodes(driver: &WebDriver, img_mode: bool) -> WebDriverResu
             // is just to show the episodes starting in 1 instead of 0
             let text: String = format!("{} - {}", i + 1, episode_text);
 
-            let mut img_path = None;
+            list_of_episodes_text.push(text);
+            list_of_episodes_elements.push(episode_element);
 
             if img_mode {
                 let img_src = episode_element
@@ -31,21 +35,28 @@ pub async fn parse_episodes(driver: &WebDriver, img_mode: bool) -> WebDriverResu
                     .await?
                     .unwrap();
                 let img_url = format!("https://vizertv.in{}", img_src.replace("s/185", "s/500"));
-
-                let vec_of_img_url: Vec<String> = vec![img_url];
-                let poster_path = get_posters_path(vec_of_img_url).await.unwrap()[0].clone();
-                img_path = Some(poster_path);
+                list_of_images_url.push(img_url);
             }
-
-            let episode = Episode {
-                text,
-                img_path,
-                episode_number: i,
-                web_element: episode_element.to_owned(),
-            };
-
-            episodes.push(episode);
+        } else {
+            break;
         }
+    }
+
+    let poster_paths = if img_mode {
+        Some(get_posters_path(list_of_images_url).await.unwrap())
+    } else {
+        None
+    };
+
+    for episode in 0..list_of_episodes_elements.len() {
+        let episode = Episode {
+            text: list_of_episodes_text[episode].clone(),
+            img_path: poster_paths.as_ref().map(|paths| paths[episode].clone()),
+            episode_number: episode,
+            web_element: list_of_episodes_elements[episode].to_owned(),
+        };
+
+        episodes.push(episode);
     }
 
     Ok(episodes)
