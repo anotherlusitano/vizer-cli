@@ -4,7 +4,7 @@ A cli tool to watch movies/series/animes in portuguese. This tool scrapes the si
 <br>
 
 <h1 align="center">
-	Showcase
+ Showcase
 </h1>
 
 [vizer-cli](https://github.com/anotherlusitano/vizer-cli/assets/108989500/9e4d75a4-7f92-4cb2-acf0-73c3f7d7d93d)
@@ -13,6 +13,7 @@ A cli tool to watch movies/series/animes in portuguese. This tool scrapes the si
 > This project is not finished. Don't have any high expectations.
 
 ## Usage
+
 ```
 CLI tool to watch movies/series/animes in portuguese
 
@@ -24,9 +25,12 @@ Commands:
 
 Options:
   -e, --english        Change all the texts in the app to english
+  -m, --mpv            Use MPV media player instead of VLC
+  -g, --geckodriver    Use geckodriver instead of chromedriver
   -v, --vim            VIM Mode for the enthusiast
   -i, --image-preview  Enable you to see the posters as you choose them
   -h, --help           Print help
+  -V, --version        Print version
 ```
 
 ## Dependencies
@@ -37,6 +41,7 @@ Options:
 - [ueberzugpp](https://github.com/jstkdng/ueberzugpp)
 
 ## Contributing
+
 Contributions are always welcome! To contribute, please follow these steps:
 
 1. Fork the repository
