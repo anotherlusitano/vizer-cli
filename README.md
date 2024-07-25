@@ -21,10 +21,27 @@ A cli tool to watch movies/series/animes in portuguese. This tool scrapes the si
 
 ## Dependencies
 
-- [rust](https://www.rust-lang.org/learn/get-started)
-- [vlc](https://www.videolan.org/vlc/)
-- [chromedriver](https://chromedriver.chromium.org/downloads)
-- [ueberzugpp](https://github.com/jstkdng/ueberzugpp)
+> [!IMPORTANT]
+> For the program to work, you need two essential things: a webdriver and a media player.
+>
+> You also need [cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html) to build the project.
+
+By default, vizer-cli uses [chromedriver](https://developer.chrome.com/docs/chromedriver) and [vlc](https://www.videolan.org/vlc/), but you can also use [geckodriver](https://github.com/mozilla/geckodriver/releases) and [mpv](https://mpv.io/) as an alternative.
+
+You can install the dependencies on Arch Linux using the following command.
+
+```sh
+yay -S chromedriver vlc
+```
+
+To use the image-preview feature, you need to have [ueberzug](https://github.com/ueber-devel/ueberzug) installed, but you can also use [ueberzugpp](https://github.com/jstkdng/ueberzugpp) if you create an alias with the following command.
+
+```sh
+alias ueberzug='ueberzugpp'
+```
+
+> [!TIP]
+> If you have Chromium installed, you don't need to install chromedriver because it's already installed
 
 ## Installation
 
