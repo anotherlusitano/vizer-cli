@@ -92,7 +92,7 @@ Use geckodriver and mpv:
 vizer-cli -g -m -s darling
 ```
 
-Use english text and image-preview:
+Use text in English and the image-preview feature:
 
 ```sh
 vizer-cli -e -i -s dragões
