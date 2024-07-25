@@ -12,6 +12,19 @@ A cli tool to watch movies/series/animes in portuguese. This tool scrapes the si
 > [!WARNING]  
 > This project is not finished. Don't have any high expectations.
 
+## Table of Contents
+
+- [Dependencies](#dependencies)
+- [Usage](#usage)
+- [Contributing](#contributing)
+
+## Dependencies
+
+- [rust](https://www.rust-lang.org/learn/get-started)
+- [vlc](https://www.videolan.org/vlc/)
+- [chromedriver](https://chromedriver.chromium.org/downloads)
+- [ueberzugpp](https://github.com/jstkdng/ueberzugpp)
+
 ## Usage
 
 ```
@@ -32,13 +45,6 @@ Options:
   -h, --help           Print help
   -V, --version        Print version
 ```
-
-## Dependencies
-
-- [rust](https://www.rust-lang.org/learn/get-started)
-- [vlc](https://www.videolan.org/vlc/)
-- [chromedriver](https://chromedriver.chromium.org/downloads)
-- [ueberzugpp](https://github.com/jstkdng/ueberzugpp)
 
 ## Contributing
 
