@@ -14,6 +14,7 @@ A cli tool to watch movies/series/animes in portuguese. This tool scrapes the si
 - [Dependencies](#dependencies)
 - [Installation](#installation)
 - [Usage](#usage)
+  - [Examples](#examples)
 - [Contributing](#contributing)
 
 ## Dependencies
@@ -71,6 +72,26 @@ Options:
   -i, --image-preview  Enable you to see the posters as you choose them
   -h, --help           Print help
   -V, --version        Print version
+```
+
+### Examples
+
+Search content:
+
+```sh
+vizer-cli -s attack on titan
+```
+
+Use geckodriver and mpv:
+
+```sh
+vizer-cli -g -m -s darling
+```
+
+Use english text and image-preview:
+
+```sh
+vizer-cli -e -i -s dragões
 ```
 
 ## Contributing
