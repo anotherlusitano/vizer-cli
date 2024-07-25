@@ -1424,9 +1424,9 @@ dependencies = [
 
 [[package]]
 name = "selthi"
-version = "0.1.1"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "356999770b1a03711416ea25354fc675d5fd86e42a714c1627e0551d8deb5ed4"
+checksum = "29ecbae036e15d3b55dfe2da54c1aa967605f6e56051ea2ed374e6d122b9dccc"
 dependencies = [
  "crossterm",
  "ueberzug",

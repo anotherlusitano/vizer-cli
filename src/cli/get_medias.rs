@@ -2,7 +2,6 @@ use scraper::{Html, Selector};
 
 use crate::{media::Media, TRANSLATION};
 
-#[tokio::main]
 pub async fn get_medias(media_name: &str) -> Vec<Media> {
     let language = TRANSLATION.get().unwrap();
 

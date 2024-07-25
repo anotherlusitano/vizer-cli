@@ -1,4 +1,4 @@
-use selthi::Selthi;
+use selthi::Select;
 
 use crate::{TRANSLATION, VIM_MODE};
 
@@ -9,7 +9,7 @@ pub fn choose_lang(langs: Vec<String>) -> Result<String, ()> {
 
     let langs = langs.iter().map(String::as_str).collect();
 
-    let ans = Selthi::new(language.select_lang_misc_text, langs)
+    let ans = Select::new(language.select_lang_misc_text, langs)
         .without_help_message()
         .with_page_size(2)
         .with_vim_mode(*vim_mode)

@@ -52,7 +52,6 @@ pub struct Translations {
     //=====# vlc.rs translations #=====//
     //misc text
     pub players_start_misc_text: &'static str,
-    pub players_exit_misc_text: &'static str,
     // err text
     pub vlc_exit_with_err: &'static str,
     pub vlc_wait_err: &'static str,
@@ -70,8 +69,15 @@ pub struct Translations {
     //err text
     pub click_season_err: &'static str,
     pub click_episode_err: &'static str,
+    pub click_play_button_err: &'static str,
     //expect text
     pub language_option_expect: &'static str,
+
+    // menu messages
+    pub menu_msg_playing: &'static str,
+    pub menu_msg_episode: &'static str,
+    pub menu_msg_episodes: &'static str,
+    pub menu_msg_of: &'static str,
 }
 
 const PORTUGUESE: Translations = Translations {
@@ -128,7 +134,6 @@ const PORTUGUESE: Translations = Translations {
     //=====# vlc.rs translations #=====//
     //misc text
     players_start_misc_text: "Iniciando o reprodutor de mídia",
-    players_exit_misc_text: "Tchau Tchau (^_^)/",
     // err text
     vlc_exit_with_err: "VLC fechou com um erro:",
     vlc_wait_err: "Falha ao esperar por VLC:",
@@ -146,8 +151,15 @@ const PORTUGUESE: Translations = Translations {
     //err text
     click_season_err: "Erro: Não é possível clicar na temporada",
     click_episode_err: "Erro: Não é possível clicar no episódio",
+    click_play_button_err: "Erro: Não é possível clicar no botão de play",
     //expect text
     language_option_expect: "Não foi possível adquirir opções de linguagens.",
+
+    // menu messages
+    menu_msg_playing: "Reproduzindo",
+    menu_msg_episode: "episódio",
+    menu_msg_episodes: "episódios",
+    menu_msg_of: "de",
 };
 
 const ENGLISH: Translations = Translations {
@@ -204,7 +216,6 @@ const ENGLISH: Translations = Translations {
     //=====# vlc.rs && mpv.rs translations #=====//
     // (vlc.rs && mpv.rs) misc text
     players_start_misc_text: "Starting the player",
-    players_exit_misc_text: "Bye bye (^_^)/",
     // vlc.rs err text
     vlc_exit_with_err: "VLC exited with an error:",
     vlc_wait_err: "Failed to wait for VLC:",
@@ -223,8 +234,15 @@ const ENGLISH: Translations = Translations {
     //err text
     click_season_err: "Error: Can't click on the season",
     click_episode_err: "Error: Can't click on the episode",
+    click_play_button_err: "Error: Can't click on the play button",
     //expect text
     language_option_expect: "Couldn't retrieve languages options.",
+
+    // menu messages
+    menu_msg_playing: "Playing",
+    menu_msg_episode: "episode",
+    menu_msg_episodes: "episodes",
+    menu_msg_of: "of",
 };
 
 pub fn get_translation(flag: &str) -> Translations {

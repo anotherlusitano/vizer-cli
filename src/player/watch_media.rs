@@ -1,200 +1,325 @@
-use std::{process::Command, process::Stdio, thread::sleep, time::Duration};
 use thirtyfour::prelude::*;
 
 use crate::{
     cli::{
-        choose_episode::choose_episode, choose_episode_with_images::choose_episode_with_images,
-        choose_lang::choose_lang, choose_season::choose_season,
+        choose_episode::choose_episode,
+        choose_media::choose_media,
+        choose_season::choose_season,
+        get_media_name_from_user::get_media_name_from_user,
+        get_media_url::get_media_url,
+        get_medias::get_medias,
+        get_video_url::get_video_url,
+        menu::{get_menu_message, get_menu_options, menu},
     },
+    driver::{parse_episodes::parse_episodes, parse_seasons::parse_seasons},
     fs::posters::get_posters_path,
     media::Media,
-    player::mpv::open_mpv,
-    player::vlc::open_vlc,
-    TRANSLATION, USE_GECKODRIVER, USE_MPV,
+    player::play_video::play_video,
+    TRANSLATION,
 };
 
-#[tokio::main]
-pub async fn watch_media(media: Media, img_mode: bool) -> WebDriverResult<()> {
+pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> WebDriverResult<()> {
     let language = TRANSLATION.get().unwrap();
-    let use_mpv = USE_MPV.get().unwrap();
-    let use_geckodriver = USE_GECKODRIVER.get().unwrap();
-
-    let url = format!("https://vizer.in/{}", &media.url);
-    let mut driver_command = String::new();
-    if *use_geckodriver {
-        driver_command.push_str("geckodriver");
-    } else {
-        driver_command.push_str("chromedriver");
-    };
-
-    let mut browser_driver = Command::new(driver_command)
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .spawn()
-        .unwrap();
-    // we need to wait command to start :(
-    sleep(Duration::from_millis(100));
+    let mut seasons = Vec::new();
+    let mut episodes = Vec::new();
+    let mut current_season: usize = 0;
+    let mut current_episode: usize = 0;
+    let mut media_name: String = media.title;
 
     print!("\x1B[2J\x1B[1;1H");
     println!("{}", language.preparing_misc_text);
 
-    let driver: WebDriver = if *use_geckodriver {
-        let mut caps = DesiredCapabilities::firefox();
-        caps.set_headless().unwrap();
-        WebDriver::new("http://localhost:4444", caps).await?
-    } else {
-        let mut caps = DesiredCapabilities::chrome();
-        caps.set_headless().unwrap();
-        WebDriver::new("http://localhost:9515", caps).await?
-    };
-
+    let url = format!("https://vizer.in/{}", &media.url);
     driver.goto(url).await?;
 
     if media.url.contains("serie/") {
-        let season_items = driver.find_all(By::Css("div[data-season-id]")).await?;
+        seasons = parse_seasons(driver).await?;
 
-        let mut season_opts: Vec<String> = Vec::new();
+        let season_opts: Vec<&str> = seasons.iter().map(|s| s.text.as_str()).collect();
 
-        for season in season_items {
-            season_opts.push(season.inner_html().await?);
-        }
-
-        let season_opt = if season_opts.len() > 1 {
-            choose_season(season_opts).unwrap()
+        current_season = if season_opts.len() > 1 {
+            choose_season(season_opts.clone()).unwrap()
         } else {
-            season_opts[0].to_string()
+            0
         };
 
-        let season_btn_xpath = format!("//div[text()='{}']", season_opt);
-        let season_element = driver.query(By::XPath(&season_btn_xpath)).first().await?;
-
-        // we execute a js script to not be redirect to other page by the pop up
-        driver
-            .execute(
-                r#"
-            arguments[0].click();
-            "#,
-                vec![season_element.to_json()?],
-            )
-            .await
-            .expect(language.click_season_err);
+        seasons[current_season]
+            .clone()
+            .click_season(driver, language.click_season_err)
+            .await?;
 
         println!("{}", language.getting_episodes_misc_text);
 
-        let episodes_list = driver.find(By::ClassName("episodes")).await?;
+        episodes = parse_episodes(driver, img_mode).await?;
 
-        let episodes_items = episodes_list.query(By::ClassName("item")).all().await?;
+        let episode_opts: Vec<&str> = episodes.iter().map(|s| s.text.as_str()).collect();
 
-        let mut episodes_opt: Vec<String> = Vec::new();
-        let mut episodes_img_url: Vec<String> = Vec::new();
+        current_episode = if episode_opts.len() > 1 {
+            if episodes[0].img_path.is_some() {
+                let episodes_img_path = episodes
+                    .iter()
+                    .map(|i| i.img_path.as_ref().unwrap().as_str())
+                    .collect();
 
-        for (i, item) in episodes_items.iter().enumerate() {
-            if item.class_name().await?.unwrap() != "item unreleased " {
-                let episode_text = item.find(By::Tag("span")).await?.inner_html().await?;
-                // this thing of adding by 1
-                // is just to show the episodes starting in 1
-                let episode: String = format!("{} - {}", i + 1, episode_text);
-
-                episodes_opt.push(episode);
-
-                if img_mode {
-                    let img_src = item.find(By::Tag("img")).await?.attr("src").await?.unwrap();
-                    let img_url =
-                        format!("https://vizertv.in{}", img_src.replace("s/185", "s/500"));
-                    episodes_img_url.push(img_url);
-                }
-            }
-        }
-
-        let episode_opt: usize = if episodes_opt.len() > 1 {
-            match img_mode {
-                true => {
-                    let posters_path = get_posters_path(episodes_img_url).await.unwrap();
-
-                    choose_episode_with_images(episodes_opt, posters_path).unwrap()
-                }
-                false => choose_episode(episodes_opt).unwrap(),
+                choose_episode(episode_opts.clone(), Some(episodes_img_path)).unwrap()
+            } else {
+                choose_episode(episode_opts.clone(), None).unwrap()
             }
         } else {
-            episodes_opt[0].parse::<usize>().unwrap() - 1
+            0
         };
 
-        // we execute a js script to not be redirect to other page by the pop up
-        driver
-            .execute(
-                r#"
-            arguments[0].click();
-            "#,
-                vec![episodes_items[episode_opt].to_json()?],
-            )
-            .await
-            .expect(language.click_episode_err);
+        episodes[current_episode]
+            .clone()
+            .click_episode(driver, language.click_episode_err)
+            .await?;
     }
 
-    println!("{}", language.getting_language_misc_text);
+    let media_url = get_media_url(driver).await?;
 
-    let langs_items = driver.query(By::Css("div[data-audio]")).all().await?;
+    let mut video_url = get_video_url(driver, media_url).await?;
 
-    let mut langs_opts: Vec<String> = Vec::new();
+    play_video(&video_url);
 
-    for lang in &langs_items {
-        let opt = lang
-            .attr("data-audio")
-            .await?
-            .expect(language.language_option_expect);
-        langs_opts.push(opt);
-    }
+    loop {
+        let menu_options = get_menu_options(&seasons, &episodes, current_episode);
 
-    let lang_opt = if langs_opts.len() == 2 {
-        choose_lang(langs_opts.clone()).unwrap()
-    } else {
-        langs_opts[0].to_string()
-    };
+        let message = get_menu_message(&media_name, &episodes, current_episode);
 
-    let mut media_id: Option<String> = None;
-    for i in 0..langs_opts.len() {
-        if langs_opts[i] == lang_opt {
-            media_id = langs_items[i].attr("data-load-player").await?;
+        match menu(menu_options, &message) {
+            Ok("replay") => play_video(&video_url),
+            Ok("quit") => break,
+            Ok("next") => {
+                driver.back().await?;
+
+                seasons = parse_seasons(driver).await?;
+
+                seasons[current_season]
+                    .clone()
+                    .click_season(driver, language.click_season_err)
+                    .await?;
+
+                println!("{}", language.getting_episodes_misc_text);
+
+                episodes = parse_episodes(driver, img_mode).await?;
+                current_episode += 1;
+
+                episodes[current_episode]
+                    .clone()
+                    .click_episode(driver, language.click_episode_err)
+                    .await?;
+
+                let media_url = get_media_url(driver).await?;
+
+                video_url = get_video_url(driver, media_url).await?;
+
+                play_video(&video_url);
+            }
+            Ok("previous") => {
+                driver.back().await?;
+
+                seasons = parse_seasons(driver).await?;
+
+                seasons[current_season]
+                    .clone()
+                    .click_season(driver, language.click_season_err)
+                    .await?;
+
+                println!("{}", language.getting_episodes_misc_text);
+
+                episodes = parse_episodes(driver, img_mode).await?;
+                current_episode -= 1;
+
+                episodes[current_episode]
+                    .clone()
+                    .click_episode(driver, language.click_episode_err)
+                    .await?;
+
+                let media_url = get_media_url(driver).await?;
+
+                video_url = get_video_url(driver, media_url).await?;
+
+                play_video(&video_url);
+            }
+            Ok("select episode") => {
+                driver.back().await?;
+
+                seasons = parse_seasons(driver).await?;
+
+                seasons[current_season]
+                    .clone()
+                    .click_season(driver, language.click_season_err)
+                    .await?;
+
+                println!("{}", language.getting_episodes_misc_text);
+
+                episodes = parse_episodes(driver, img_mode).await?;
+
+                let episode_opts: Vec<&str> = episodes.iter().map(|s| s.text.as_str()).collect();
+
+                current_episode = if episodes[0].img_path.is_some() {
+                    let episodes_img_path = episodes
+                        .iter()
+                        .map(|i| i.img_path.as_ref().unwrap().as_str())
+                        .collect();
+
+                    choose_episode(episode_opts.clone(), Some(episodes_img_path)).unwrap()
+                } else {
+                    choose_episode(episode_opts.clone(), None).unwrap()
+                };
+
+                episodes[current_episode]
+                    .clone()
+                    .click_episode(driver, language.click_episode_err)
+                    .await?;
+
+                let media_url = get_media_url(driver).await?;
+
+                video_url = get_video_url(driver, media_url).await?;
+
+                play_video(&video_url);
+            }
+            Ok("select season") => {
+                driver.back().await?;
+
+                seasons = parse_seasons(driver).await?;
+
+                let season_opts: Vec<&str> = seasons.iter().map(|s| s.text.as_str()).collect();
+
+                current_season = choose_season(season_opts.clone()).unwrap();
+
+                seasons[current_season]
+                    .clone()
+                    .click_season(driver, language.click_season_err)
+                    .await?;
+
+                println!("{}", language.getting_episodes_misc_text);
+
+                episodes = parse_episodes(driver, img_mode).await?;
+
+                let episode_opts: Vec<&str> = episodes.iter().map(|s| s.text.as_str()).collect();
+
+                current_episode = if episode_opts.len() > 1 {
+                    if episodes[0].img_path.is_some() {
+                        let episodes_img_path = episodes
+                            .iter()
+                            .map(|i| i.img_path.as_ref().unwrap().as_str())
+                            .collect();
+
+                        choose_episode(episode_opts.clone(), Some(episodes_img_path)).unwrap()
+                    } else {
+                        choose_episode(episode_opts.clone(), None).unwrap()
+                    }
+                } else {
+                    0
+                };
+
+                episodes[current_episode]
+                    .clone()
+                    .click_episode(driver, language.click_episode_err)
+                    .await?;
+
+                let media_url = get_media_url(driver).await?;
+
+                video_url = get_video_url(driver, media_url).await?;
+
+                play_video(&video_url);
+            }
+            Ok("search") => {
+                let mut posters_path: Vec<String> = Vec::new();
+
+                let media_name_from_user = get_media_name_from_user().unwrap();
+
+                let medias = get_medias(&media_name_from_user).await;
+
+                if medias.is_empty() {
+                    eprintln!("{}", language.media_name_is_empty_exit_text);
+                    break;
+                }
+
+                if img_mode {
+                    let medias_poster_url: Vec<String> = medias
+                        .clone()
+                        .into_iter()
+                        .map(|media| media.poster_url)
+                        .collect();
+
+                    posters_path = get_posters_path(medias_poster_url).await.unwrap();
+                }
+                match choose_media(medias, img_mode, posters_path) {
+                    Ok(media) => {
+                        let url = format!("https://vizer.in/{}", &media.url);
+                        driver.goto(url).await?;
+
+                        media_name = media.title;
+
+                        if media.url.contains("serie/") {
+                            seasons = parse_seasons(driver).await?;
+
+                            let season_opts: Vec<&str> =
+                                seasons.iter().map(|s| s.text.as_str()).collect();
+
+                            current_season = if season_opts.len() > 1 {
+                                choose_season(season_opts.clone()).unwrap()
+                            } else {
+                                0
+                            };
+
+                            seasons[current_season]
+                                .clone()
+                                .click_season(driver, language.click_season_err)
+                                .await?;
+
+                            println!("{}", language.getting_episodes_misc_text);
+
+                            episodes = parse_episodes(driver, img_mode).await?;
+
+                            let episode_opts: Vec<&str> =
+                                episodes.iter().map(|s| s.text.as_str()).collect();
+
+                            current_episode = if episode_opts.len() > 1 {
+                                if episodes[0].img_path.is_some() {
+                                    let episodes_img_path = episodes
+                                        .iter()
+                                        .map(|i| i.img_path.as_ref().unwrap().as_str())
+                                        .collect();
+
+                                    choose_episode(episode_opts.clone(), Some(episodes_img_path))
+                                        .unwrap()
+                                } else {
+                                    choose_episode(episode_opts.clone(), None).unwrap()
+                                }
+                            } else {
+                                0
+                            };
+
+                            episodes[current_episode]
+                                .clone()
+                                .click_episode(driver, language.click_episode_err)
+                                .await?;
+                        } else {
+                            seasons.clear();
+                            episodes.clear();
+                        }
+
+                        let media_url = get_media_url(driver).await?;
+
+                        video_url = get_video_url(driver, media_url).await?;
+
+                        play_video(&video_url);
+                    }
+                    Err(err) => {
+                        eprintln!("{:?}", err);
+                        break;
+                    }
+                }
+            }
+            Err(err) => {
+                eprint!("{:?}", err);
+                break;
+            }
+            _ => break,
         }
-    }
-
-    println!("{}", language.fetching_misc_text);
-
-    let media_url = format!(
-        "https://vizer.in/embed/getEmbed.php?id={}&sv=mixdrop",
-        media_id.unwrap()
-    );
-
-    driver.goto(media_url).await?;
-
-    driver.enter_frame(0).await?;
-
-    let play_button = driver
-        .query(By::ClassName("vjs-big-play-button"))
-        .first()
-        .await?;
-
-    // we execute a js script to not be redirect to other page by the pop up
-    driver
-        .execute(
-            r#"
-            arguments[0].click();
-            "#,
-            vec![play_button.to_json()?],
-        )
-        .await?;
-
-    let video = driver.find(By::Id("videojs_html5_api")).await?;
-
-    let video_url = format!("https:{}", video.attr("src").await?.unwrap());
-
-    driver.quit().await?;
-    browser_driver.kill().unwrap();
-
-    if *use_mpv {
-        open_mpv(&video_url);
-    } else {
-        open_vlc(&video_url);
     }
 
     Ok(())

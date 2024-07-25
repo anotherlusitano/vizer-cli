@@ -5,26 +5,30 @@ use crate::{
     fs::temp_dir::{create_temp_dir, remove_temp_dir},
 };
 use clap::{arg, Arg, Command};
-use cli::{choose_media::choose_media, choose_media_with_images::choose_media_with_images};
+use cli::choose_media::choose_media;
+use driver::start_driver::{get_driver, start_browser_driver};
 use fs::posters::get_posters_path;
 use language::{get_translation, Translations};
 use player::watch_media::watch_media;
 use scraper::is_offline::is_offline;
-use tokio::runtime::Runtime;
 
 mod cli;
+mod driver;
+pub mod episode;
 mod fs;
 pub mod language;
 pub mod media;
 mod player;
 mod scraper;
+pub mod season;
 
 static TRANSLATION: OnceLock<Translations> = OnceLock::new();
 static VIM_MODE: OnceLock<bool> = OnceLock::new();
 static USE_MPV: OnceLock<bool> = OnceLock::new();
 static USE_GECKODRIVER: OnceLock<bool> = OnceLock::new();
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let matches = Command::new("vizer-cli")
         .about("CLI tool to watch movies/series/animes in portuguese")
         .version(env!("CARGO_PKG_VERSION"))
@@ -115,7 +119,7 @@ fn main() {
 
     let language = TRANSLATION.get().unwrap();
 
-    if is_offline() {
+    if is_offline().await {
         eprintln!("{}", language.is_currently_offline);
         exit(1)
     }
@@ -134,12 +138,18 @@ fn main() {
                 exit(1)
             }
 
-            let medias = get_medias(&media_name);
+            let medias = get_medias(&media_name).await;
 
             if medias.is_empty() {
                 eprintln!("{}", language.media_name_is_empty_exit_text);
                 exit(1)
             }
+
+            let mut browser_driver = start_browser_driver();
+
+            let driver = get_driver().await;
+
+            let mut posters_path: Vec<String> = Vec::new();
 
             if img_mode {
                 create_temp_dir();
@@ -149,28 +159,21 @@ fn main() {
                     .map(|media| media.poster_url)
                     .collect();
 
-                let rt = Runtime::new().unwrap();
-                let future = get_posters_path(medias_poster_url);
-                let posters_path = rt.block_on(future).unwrap();
-
-                match choose_media_with_images(medias, posters_path) {
-                    Ok(media) => {
-                        watch_media(media, img_mode).unwrap();
-                        remove_temp_dir();
-                    }
-                    Err(err) => {
-                        remove_temp_dir();
-                        eprintln!("{:?}", err);
-                    }
+                posters_path = get_posters_path(medias_poster_url).await.unwrap();
+            }
+            match choose_media(medias, img_mode, posters_path) {
+                Ok(media) => {
+                    watch_media(media, img_mode, &driver).await.unwrap();
+                    remove_temp_dir();
+                    driver.quit().await.unwrap();
+                    browser_driver.kill().unwrap();
                 }
-            } else {
-                match choose_media(medias) {
-                    Ok(media) => {
-                        watch_media(media, img_mode).unwrap();
-                    }
-                    Err(err) => {
-                        eprintln!("{:?}", err);
-                    }
+                Err(err) => {
+                    eprintln!("{:?}", err);
+                    driver.quit().await.unwrap();
+                    browser_driver.kill().unwrap();
+
+                    remove_temp_dir();
                 }
             }
         }

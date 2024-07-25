@@ -2,7 +2,6 @@ use scraper::{Html, Selector};
 
 use crate::TRANSLATION;
 
-#[tokio::main]
 pub async fn is_offline() -> bool {
     let language = TRANSLATION.get().unwrap();
 
