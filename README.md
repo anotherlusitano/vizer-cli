@@ -1,5 +1,9 @@
 <h3 align="center">
 A cli tool to watch movies/series/animes in portuguese. This tool scrapes the site <a href="https://vizertv.in">vizertv</a>
+    <p>
+        <b>English</b> |
+        <a href="https://github.com/anotherlusitano/vizer-cli/blob/main/README-pt.md">Рortuguês</a>
+    </p>
 </h3>
 <br>
 
