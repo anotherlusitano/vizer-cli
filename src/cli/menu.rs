@@ -1,9 +1,9 @@
 use selthi::Select;
 
-use crate::{episode::Episode, season::Season};
+use crate::{episode::Episode, season::Season, TRANSLATION};
 
-pub fn menu(menu_options: Vec<&str>) -> Result<&str, ()> {
-    let ans = Select::new("Select what you want to do", menu_options)
+pub fn menu<'a>(menu_options: Vec<&'a str>, message: &'a str) -> Result<&'a str, ()> {
+    let ans = Select::new(message, menu_options)
         .without_help_message()
         .prompt();
 
@@ -11,6 +11,34 @@ pub fn menu(menu_options: Vec<&str>) -> Result<&str, ()> {
         Some(option) => Ok(option),
         None => Err(println!("Couldn't get option!")),
     }
+}
+
+pub fn get_menu_message<'a>(
+    media_name: &'a str,
+    episodes: &'a [Episode],
+    current_episode: usize,
+) -> String {
+    let language = TRANSLATION.get().unwrap();
+
+    if episodes.is_empty() {
+        // Will return this message when its a movie
+        return format!("{} {}", language.menu_msg_playing, media_name);
+    }
+
+    // HACK: We use the format! like that as a workaround because
+    // its not possible to use format! with a variable instead of a string literal
+    // where the language.menu_message its something like this:
+    // "Playing episode {} of {} ({} episodes)"
+    format!(
+        "{} {} {} {} {} ({} {})",
+        language.menu_msg_playing,
+        language.menu_msg_episode,
+        current_episode + 1,
+        language.menu_msg_of,
+        media_name,
+        episodes.len(),
+        language.menu_msg_episodes,
+    )
 }
 
 pub fn get_menu_options(

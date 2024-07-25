@@ -9,7 +9,7 @@ use crate::{
         get_media_url::get_media_url,
         get_medias::get_medias,
         get_video_url::get_video_url,
-        menu::{get_menu_options, menu},
+        menu::{get_menu_message, get_menu_options, menu},
     },
     driver::{parse_episodes::parse_episodes, parse_seasons::parse_seasons},
     fs::posters::get_posters_path,
@@ -24,6 +24,7 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
     let mut episodes = Vec::new();
     let mut current_season: usize = 0;
     let mut current_episode: usize = 0;
+    let mut media_name: String = media.title;
 
     print!("\x1B[2J\x1B[1;1H");
     println!("{}", language.preparing_misc_text);
@@ -83,7 +84,9 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
     loop {
         let menu_options = get_menu_options(&seasons, &episodes, current_episode);
 
-        match menu(menu_options) {
+        let message = get_menu_message(&media_name, &episodes, current_episode);
+
+        match menu(menu_options, &message) {
             Ok("replay") => play_video(&video_url),
             Ok("quit") => break,
             Ok("next") => {
@@ -225,9 +228,9 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
             Ok("search") => {
                 let mut posters_path: Vec<String> = Vec::new();
 
-                let media_name = get_media_name_from_user().unwrap();
+                let media_name_from_user = get_media_name_from_user().unwrap();
 
-                let medias = get_medias(&media_name).await;
+                let medias = get_medias(&media_name_from_user).await;
 
                 if medias.is_empty() {
                     eprintln!("{}", language.media_name_is_empty_exit_text);
@@ -247,6 +250,8 @@ pub async fn watch_media(media: Media, img_mode: bool, driver: &WebDriver) -> We
                     Ok(media) => {
                         let url = format!("https://vizer.in/{}", &media.url);
                         driver.goto(url).await?;
+
+                        media_name = media.title;
 
                         if media.url.contains("serie/") {
                             seasons = parse_seasons(driver).await?;

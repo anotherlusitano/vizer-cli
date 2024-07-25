@@ -72,6 +72,12 @@ pub struct Translations {
     pub click_play_button_err: &'static str,
     //expect text
     pub language_option_expect: &'static str,
+
+    // menu messages
+    pub menu_msg_playing: &'static str,
+    pub menu_msg_episode: &'static str,
+    pub menu_msg_episodes: &'static str,
+    pub menu_msg_of: &'static str,
 }
 
 const PORTUGUESE: Translations = Translations {
@@ -148,6 +154,12 @@ const PORTUGUESE: Translations = Translations {
     click_play_button_err: "Erro: Não é possível clicar no botão de play",
     //expect text
     language_option_expect: "Não foi possível adquirir opções de linguagens.",
+
+    // menu messages
+    menu_msg_playing: "Reproduzindo",
+    menu_msg_episode: "episódio",
+    menu_msg_episodes: "episódios",
+    menu_msg_of: "de",
 };
 
 const ENGLISH: Translations = Translations {
@@ -225,6 +237,12 @@ const ENGLISH: Translations = Translations {
     click_play_button_err: "Error: Can't click on the play button",
     //expect text
     language_option_expect: "Couldn't retrieve languages options.",
+
+    // menu messages
+    menu_msg_playing: "Playing",
+    menu_msg_episode: "episode",
+    menu_msg_episodes: "episodes",
+    menu_msg_of: "of",
 };
 
 pub fn get_translation(flag: &str) -> Translations {
