@@ -9,9 +9,6 @@ A cli tool to watch movies/series/animes in portuguese. This tool scrapes the si
 
 [vizer-cli](https://github.com/anotherlusitano/vizer-cli/assets/108989500/9e4d75a4-7f92-4cb2-acf0-73c3f7d7d93d)
 
-> [!WARNING]  
-> This project is not finished. Don't have any high expectations.
-
 ## Table of Contents
 
 - [Dependencies](#dependencies)
