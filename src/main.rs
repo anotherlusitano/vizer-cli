@@ -58,7 +58,7 @@ async fn main() {
                 .long("geckodriver")
                 .required(false)
                 .num_args(0)
-                .help("Use web driver for gecko based browsers like (Firefox, LibreWolf, etc)")
+                .help("Use geckodriver instead of chromedriver")
                 .action(clap::ArgAction::SetTrue),
         )
         .arg(
