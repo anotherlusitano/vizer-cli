@@ -14,4 +14,4 @@ clap = "4.4.4"
 thirtyfour = "0.31.0"
 tokio = "1.32.0"
 futures = "0.3.30"
-selthi = { version = "0.2.3", features = ["with_images"] }
+selthi = { version = "0.2.4", features = ["with_images"] }
