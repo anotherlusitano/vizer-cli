@@ -8,6 +8,11 @@ use thirtyfour::{DesiredCapabilities, WebDriver};
 
 use crate::USE_GECKODRIVER;
 
+fn kill_browser_driver(driver_command: &str) {
+    let mut child = Command::new("pkill").arg(driver_command).spawn().unwrap();
+    child.kill().unwrap();
+}
+
 pub async fn get_driver() -> WebDriver {
     let use_geckodriver = USE_GECKODRIVER.get().unwrap();
 
@@ -31,6 +36,8 @@ pub fn start_browser_driver() -> Child {
     } else {
         "chromedriver"
     };
+
+    kill_browser_driver(driver_command);
 
     let browser_driver = Command::new(driver_command)
         .stdout(Stdio::null())
