@@ -46,6 +46,7 @@ pub fn start_browser_driver() -> Child {
 
     let browser_driver = Command::new(driver_command)
         .stdout(Stdio::null())
+        .stderr(Stdio::null())
         .spawn()
         .unwrap();
 
