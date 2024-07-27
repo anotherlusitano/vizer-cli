@@ -4,21 +4,33 @@ use std::{
     time::Duration,
 };
 
-use thirtyfour::{DesiredCapabilities, WebDriver};
+use fantoccini::{Client, ClientBuilder};
 
 use crate::USE_GECKODRIVER;
 
-pub async fn get_driver() -> WebDriver {
+pub async fn get_driver() -> Client {
     let use_geckodriver = USE_GECKODRIVER.get().unwrap();
 
-    let driver: WebDriver = if *use_geckodriver {
-        let mut caps = DesiredCapabilities::firefox();
-        caps.set_headless().unwrap();
-        WebDriver::new("http://localhost:4444", caps).await.unwrap()
+    let driver: Client = if *use_geckodriver {
+        let mut caps = serde_json::map::Map::new();
+        let opts = serde_json::json!({ "args": ["--headless"] });
+        caps.insert("moz:firefoxOptions".to_string(), opts);
+        ClientBuilder::native()
+            .capabilities(caps)
+            .connect("http://localhost:4444")
+            .await
+            .expect("failed to connect to WebDriver")
     } else {
-        let mut caps = DesiredCapabilities::chrome();
-        caps.set_headless().unwrap();
-        WebDriver::new("http://localhost:9515", caps).await.unwrap()
+        let mut caps = serde_json::map::Map::new();
+        let opts = serde_json::json!({
+            "args": ["--headless", "--disable-gpu", "--no-sandbox", "--disable-dev-shm-usage"],
+        });
+        caps.insert("goog:chromeOptions".to_string(), opts);
+        ClientBuilder::native()
+            .capabilities(caps)
+            .connect("http://localhost:9515")
+            .await
+            .expect("failed to connect to WebDriver")
     };
 
     driver

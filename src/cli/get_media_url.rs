@@ -1,12 +1,17 @@
-use thirtyfour::prelude::*;
+use fantoccini::{error::CmdError, Client, Locator};
 
 use crate::{cli::choose_lang::choose_lang, TRANSLATION};
 
-pub async fn get_media_url(driver: &WebDriver) -> WebDriverResult<String> {
+pub async fn get_media_url(driver: &Client) -> Result<String, CmdError> {
     let language = TRANSLATION.get().unwrap();
     println!("{}", language.getting_language_misc_text);
 
-    let langs_items = driver.query(By::Css("div[data-audio]")).all().await?;
+    // we have to wait for the language button to appear
+    driver
+        .wait()
+        .for_element(Locator::Css("div[data-audio]"))
+        .await?;
+    let langs_items = driver.find_all(Locator::Css("div[data-audio]")).await?;
 
     let mut langs_opts: Vec<String> = Vec::new();
 
