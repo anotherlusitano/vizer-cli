@@ -1,4 +1,4 @@
-use thirtyfour::prelude::*;
+use fantoccini::error::CmdError;
 
 use crate::{
     cli::{
@@ -22,7 +22,7 @@ use crate::{
     TRANSLATION,
 };
 
-pub async fn watch_media(media: Media, img_mode: bool) -> WebDriverResult<()> {
+pub async fn watch_media(media: Media, img_mode: bool) -> Result<(), CmdError> {
     let language = TRANSLATION.get().unwrap();
     let mut seasons = Vec::new();
     let mut episodes = Vec::new();
@@ -37,7 +37,7 @@ pub async fn watch_media(media: Media, img_mode: bool) -> WebDriverResult<()> {
     let driver = get_driver().await;
 
     let url = format!("https://vizer.in/{}", &media.url);
-    driver.goto(url).await?;
+    driver.goto(&url).await?;
 
     if media.url.contains("serie/") {
         seasons = parse_seasons(&driver).await?;
@@ -256,7 +256,7 @@ pub async fn watch_media(media: Media, img_mode: bool) -> WebDriverResult<()> {
                 match choose_media(medias, img_mode, posters_path) {
                     Ok(media) => {
                         let url = format!("https://vizer.in/{}", &media.url);
-                        driver.goto(url).await?;
+                        driver.goto(&url).await?;
 
                         media_name = media.title;
 
@@ -317,7 +317,7 @@ pub async fn watch_media(media: Media, img_mode: bool) -> WebDriverResult<()> {
                     }
                     Err(err) => {
                         eprintln!("{:?}", err);
-                        driver.to_owned().quit().await.unwrap();
+                        driver.to_owned().close().await.unwrap();
                         browser_driver.kill().unwrap();
                         break;
                     }
@@ -325,7 +325,7 @@ pub async fn watch_media(media: Media, img_mode: bool) -> WebDriverResult<()> {
             }
             Err(err) => {
                 eprint!("{:?}", err);
-                driver.to_owned().quit().await.unwrap();
+                driver.to_owned().close().await.unwrap();
                 browser_driver.kill().unwrap();
                 break;
             }
@@ -333,7 +333,7 @@ pub async fn watch_media(media: Media, img_mode: bool) -> WebDriverResult<()> {
         }
     }
 
-    driver.quit().await.unwrap();
+    driver.close().await.unwrap();
     browser_driver.kill().unwrap();
     Ok(())
 }

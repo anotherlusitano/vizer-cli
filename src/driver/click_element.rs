@@ -1,18 +1,19 @@
-use thirtyfour::{error::WebDriverResult, WebDriver, WebElement};
+use fantoccini::{elements::Element, error::CmdError, Client};
+use serde_json::json;
 
 /// This function is used when we need to click on a web element but there is a pop up in front of
 /// it
 pub async fn click_element(
-    driver: &WebDriver,
-    element: WebElement,
+    driver: &Client,
+    element: Element,
     error_message: &str,
-) -> WebDriverResult<()> {
+) -> Result<(), CmdError> {
     driver
         .execute(
             r#"
             arguments[0].click();
             "#,
-            vec![element.to_json()?],
+            vec![json!(element)],
         )
         .await
         .expect(error_message);
