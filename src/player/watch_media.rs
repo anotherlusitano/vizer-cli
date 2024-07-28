@@ -97,7 +97,7 @@ pub async fn watch_media(media: Media, img_mode: bool) -> Result<(), CmdError> {
             Ok("replay") => play_video(&video_url),
             Ok("quit") => break,
             Ok("next") => {
-                driver.back().await?;
+                driver.goto(&url).await?;
 
                 seasons = parse_seasons(&driver).await?;
 
@@ -123,7 +123,7 @@ pub async fn watch_media(media: Media, img_mode: bool) -> Result<(), CmdError> {
                 play_video(&video_url);
             }
             Ok("previous") => {
-                driver.back().await?;
+                driver.goto(&url).await?;
 
                 seasons = parse_seasons(&driver).await?;
 
@@ -149,7 +149,7 @@ pub async fn watch_media(media: Media, img_mode: bool) -> Result<(), CmdError> {
                 play_video(&video_url);
             }
             Ok("select episode") => {
-                driver.back().await?;
+                driver.goto(&url).await?;
 
                 seasons = parse_seasons(&driver).await?;
 
@@ -187,7 +187,7 @@ pub async fn watch_media(media: Media, img_mode: bool) -> Result<(), CmdError> {
                 play_video(&video_url);
             }
             Ok("select season") => {
-                driver.back().await?;
+                driver.goto(&url).await?;
 
                 seasons = parse_seasons(&driver).await?;
 
