@@ -1,3 +1,5 @@
+use std::process::exit;
+
 use fantoccini::error::CmdError;
 
 use crate::{
@@ -43,7 +45,14 @@ pub async fn watch_media(media: Media, img_mode: bool) -> Result<(), CmdError> {
         let season_opts: Vec<&str> = seasons.iter().map(|s| s.text.as_str()).collect();
 
         let season_opt = if season_opts.len() > 1 {
-            choose_season(season_opts.clone()).unwrap()
+            match choose_season(season_opts) {
+                Ok(season) => season,
+                Err(_) => {
+                    driver.close().await.unwrap();
+                    browser_driver.kill().unwrap();
+                    exit(1)
+                }
+            }
         } else {
             0
         };
@@ -66,9 +75,23 @@ pub async fn watch_media(media: Media, img_mode: bool) -> Result<(), CmdError> {
                     .map(|i| i.img_path.as_ref().unwrap().as_str())
                     .collect();
 
-                choose_episode(episode_opts.clone(), Some(episodes_img_path)).unwrap()
+                match choose_episode(episode_opts, Some(episodes_img_path)) {
+                    Ok(episode_opt) => episode_opt,
+                    Err(_) => {
+                        driver.close().await.unwrap();
+                        browser_driver.kill().unwrap();
+                        exit(1)
+                    }
+                }
             } else {
-                choose_episode(episode_opts.clone(), None).unwrap()
+                match choose_episode(episode_opts, None) {
+                    Ok(episode_opt) => episode_opt,
+                    Err(_) => {
+                        driver.close().await.unwrap();
+                        browser_driver.kill().unwrap();
+                        exit(1)
+                    }
+                }
             }
         } else {
             0
@@ -129,9 +152,23 @@ pub async fn watch_media(media: Media, img_mode: bool) -> Result<(), CmdError> {
                         .map(|i| i.img_path.as_ref().unwrap().as_str())
                         .collect();
 
-                    choose_episode(episode_opts.clone(), Some(episodes_img_path)).unwrap()
+                    match choose_episode(episode_opts, Some(episodes_img_path)) {
+                        Ok(episode_opt) => episode_opt,
+                        Err(_) => {
+                            driver.close().await.unwrap();
+                            browser_driver.kill().unwrap();
+                            exit(1)
+                        }
+                    }
                 } else {
-                    choose_episode(episode_opts.clone(), None).unwrap()
+                    match choose_episode(episode_opts, None) {
+                        Ok(episode_opt) => episode_opt,
+                        Err(_) => {
+                            driver.close().await.unwrap();
+                            browser_driver.kill().unwrap();
+                            exit(1)
+                        }
+                    }
                 };
 
                 episodes[current_episode]
@@ -148,7 +185,14 @@ pub async fn watch_media(media: Media, img_mode: bool) -> Result<(), CmdError> {
 
                 let season_opts: Vec<&str> = seasons.iter().map(|s| s.text.as_str()).collect();
 
-                let season_opt = choose_season(season_opts.clone()).unwrap();
+                let season_opt = match choose_season(season_opts) {
+                    Ok(season) => season,
+                    Err(_) => {
+                        driver.close().await.unwrap();
+                        browser_driver.kill().unwrap();
+                        exit(1)
+                    }
+                };
 
                 seasons[season_opt]
                     .clone()
@@ -171,9 +215,23 @@ pub async fn watch_media(media: Media, img_mode: bool) -> Result<(), CmdError> {
                             .map(|i| i.img_path.as_ref().unwrap().as_str())
                             .collect();
 
-                        choose_episode(episode_opts.clone(), Some(episodes_img_path)).unwrap()
+                        match choose_episode(episode_opts, Some(episodes_img_path)) {
+                            Ok(episode_opt) => episode_opt,
+                            Err(_) => {
+                                driver.close().await.unwrap();
+                                browser_driver.kill().unwrap();
+                                exit(1)
+                            }
+                        }
                     } else {
-                        choose_episode(episode_opts.clone(), None).unwrap()
+                        match choose_episode(episode_opts, None) {
+                            Ok(episode_opt) => episode_opt,
+                            Err(_) => {
+                                driver.close().await.unwrap();
+                                browser_driver.kill().unwrap();
+                                exit(1)
+                            }
+                        }
                     }
                 } else {
                     0
@@ -223,7 +281,14 @@ pub async fn watch_media(media: Media, img_mode: bool) -> Result<(), CmdError> {
                                 seasons.iter().map(|s| s.text.as_str()).collect();
 
                             let season_opt = if season_opts.len() > 1 {
-                                choose_season(season_opts.clone()).unwrap()
+                                match choose_season(season_opts) {
+                                    Ok(season) => season,
+                                    Err(_) => {
+                                        driver.close().await.unwrap();
+                                        browser_driver.kill().unwrap();
+                                        exit(1)
+                                    }
+                                }
                             } else {
                                 0
                             };
@@ -247,10 +312,23 @@ pub async fn watch_media(media: Media, img_mode: bool) -> Result<(), CmdError> {
                                         .map(|i| i.img_path.as_ref().unwrap().as_str())
                                         .collect();
 
-                                    choose_episode(episode_opts.clone(), Some(episodes_img_path))
-                                        .unwrap()
+                                    match choose_episode(episode_opts, Some(episodes_img_path)) {
+                                        Ok(episode_opt) => episode_opt,
+                                        Err(_) => {
+                                            driver.close().await.unwrap();
+                                            browser_driver.kill().unwrap();
+                                            exit(1)
+                                        }
+                                    }
                                 } else {
-                                    choose_episode(episode_opts.clone(), None).unwrap()
+                                    match choose_episode(episode_opts, None) {
+                                        Ok(episode_opt) => episode_opt,
+                                        Err(_) => {
+                                            driver.close().await.unwrap();
+                                            browser_driver.kill().unwrap();
+                                            exit(1)
+                                        }
+                                    }
                                 }
                             } else {
                                 0
