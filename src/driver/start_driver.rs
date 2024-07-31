@@ -13,7 +13,16 @@ pub async fn get_driver() -> Client {
 
     let driver: Client = if *use_geckodriver {
         let mut caps = serde_json::map::Map::new();
-        let opts = serde_json::json!({ "args": ["--headless"] });
+        let opts = serde_json::json!({
+            // NOTE: We use these prefs so that the video doesn't play automatically
+            // when we click on it to get the src of the video
+            "prefs": {
+                "media.autoplay.default": 1,
+                "media.autoplay.allow-muted": false,
+                "media.autoplay.blocking_policy": 2,
+            },
+            "args": ["--headless"]
+        });
         caps.insert("moz:firefoxOptions".to_string(), opts);
         ClientBuilder::native()
             .capabilities(caps)
