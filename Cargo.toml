@@ -2,9 +2,12 @@
 name = "vizer-cli"
 version = "0.3.0"
 description = "A cli tool to watch movies, series and animes in Portuguese"
+repository = "https://github.com/anotherlusitano/vizer-cli"
 edition = "2021"
+readme = "./CRATE_README.md"
 authors = ["João Ribeiro"]
 license = "GPL-3.0"
+keywords = ["cli", "movies", "series", "anime", "portuguese"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
