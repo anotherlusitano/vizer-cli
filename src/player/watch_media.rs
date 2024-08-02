@@ -176,6 +176,8 @@ pub async fn watch_media(media: Media, img_mode: bool) -> Result<(), CmdError> {
                     .click_episode(&driver, language.click_episode_err)
                     .await?;
 
+                // NOTE: We wait for the language options to update
+                std::thread::sleep(std::time::Duration::from_millis(500));
                 video_url = get_video_url(&driver).await?;
 
                 play_video(&video_url);
@@ -242,6 +244,8 @@ pub async fn watch_media(media: Media, img_mode: bool) -> Result<(), CmdError> {
                     .click_episode(&driver, language.click_episode_err)
                     .await?;
 
+                // NOTE: We wait for the language options to update
+                std::thread::sleep(std::time::Duration::from_millis(500));
                 video_url = get_video_url(&driver).await?;
 
                 play_video(&video_url);
