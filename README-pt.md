@@ -1,9 +1,5 @@
 <h3 align="center">
 Uma ferramenta no terminal que te deixa assistir filmes, series e animes em português. Esta ferramenta faz scraping do site <a href="https://vizertv.in">vizertv</a>
-    <p>
-        <b>Português</b> |
-        <a href="https://github.com/anotherlusitano/vizer-cli/blob/main/README.md">English</a>
-    </p>
 </h3>
 <br>
 
@@ -13,28 +9,68 @@ Uma ferramenta no terminal que te deixa assistir filmes, series e animes em port
 
 [vizer-cli](https://github.com/user-attachments/assets/6ef85494-1937-4ee3-bc40-a3e656c6ec38)
 
+<p>
+    <b>Português</b> |
+    <a href="https://github.com/anotherlusitano/vizer-cli/blob/main/README.md">English</a>
+</p>
+
 ## Tabela de conteúdos
 
-- [Dependências](#dependências)
+- [Pré-requesitos](#pré-requesitos)
 - [Instalação](#instalação)
 - [Como usar](#como-usar)
   - [Exemplos](#exemplos)
 - [Contribuir](#contribuir)
 
-## Dependências
+## Pré-requesitos
 
-> [!IMPORTANT]
-> Para este programa funcionar, tu precisas de ter duas coisas essenciais: um webdriver e um reprodutor de media.
->
-> Vais precisar do [cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html) para instalar o programa.
+Para este programa funcionar, precisas de ter duas coisas essenciais: um webdriver e um reprodutor de media.
 
-Por padrão, o vizer-cli usa o [chromedriver](https://developer.chrome.com/docs/chromedriver) e o [vlc](https://www.videolan.org/vlc/), mas também podes usar o [geckodriver](https://github.com/mozilla/geckodriver/releases) e o [mpv](https://mpv.io/) como alternativa.
+Para o webdriver, podes escolher entre:
 
-Para instalar as dependências no Arch Linux, usa o seguinte comando.
+- [geckodriver](https://github.com/mozilla/geckodriver)
+- [chromedriver](https://developer.chrome.com/docs/chromedriver)
+
+Para o reprodutor de media, podes escolher entre:
+
+- [vlc](https://www.videolan.org/vlc/)
+- [mpv](https://mpv.io/)
+
+> Por padrão, o programa usa o chromedriver e o vlc.
+
+<details><summary>Instalação no Arch Linux</summary>
+Aqui estão os comandos para instalar todos os pré-requesitos:
 
 ```sh
+# Para instalar o padrão
 yay -S chromedriver vlc
 ```
+
+```sh
+# Para instalar as alternativas
+yay -S geckodriver mpv
+```
+
+Também podes instalar o pacote do Chromium em vez do pacote do chromedriver, porque as versões recentes do Chrmium trazem o chromedriver.
+
+```sh
+sudo pacman -S chromium
+```
+
+</details>
+
+<details><summary>Instalação no Windows</summary>
+Aqui os links para instalar os pré-requesitos:
+<ul>
+  <li>chromedriver: https://developer.chrome.com/docs/chromedriver/downloads</li>
+  <li>geckodriver: https://github.com/mozilla/geckodriver/releases</li>
+  <li>vlc: https://www.videolan.org/vlc/download-windows.html</li>
+  <li>vlc: mpv: https://mpv.io/installation/</li>
+</ul>
+
+<b>Tem a certeza que todos os programas fazem parte das variáveis do sistema!</b>
+
+</details>
 
 Para usar a funcionalidade de image-preview, precisas de ter o programa [ueberzug](https://github.com/ueber-devel/ueberzug) instalado, mas também podes usar o programa [ueberzugpp](https://github.com/jstkdng/ueberzugpp) se criares uma alias com o seguinte comando.
 
@@ -44,9 +80,6 @@ alias ueberzug='ueberzugpp'
 
 > [!WARNING]
 > Ueberzug não suporta o Windows, então precisas de instalar algo como o WSL para utilizar a funcionalidade de image-preview.
-
-> [!TIP]
-> Se já tiveres o Chromium instalado, não precisas de instalar o chromedriver porque ele já vem instalado.
 
 ## Instalação
 

@@ -1,9 +1,5 @@
 <h3 align="center">
 A cli tool to watch movies, series and animes in Portuguese. This tool scrapes the site <a href="https://vizertv.in">vizertv</a>
-    <p>
-        <b>English</b> |
-        <a href="https://github.com/anotherlusitano/vizer-cli/blob/main/README-pt.md">Рortuguês</a>
-    </p>
 </h3>
 <br>
 
@@ -13,28 +9,68 @@ A cli tool to watch movies, series and animes in Portuguese. This tool scrapes t
 
 [vizer-cli](https://github.com/user-attachments/assets/6ef85494-1937-4ee3-bc40-a3e656c6ec38)
 
+<p>
+    <b>English</b> |
+    <a href="https://github.com/anotherlusitano/vizer-cli/blob/main/README-pt.md">Рortuguês</a>
+</p>
+
 ## Table of Contents
 
-- [Dependencies](#dependencies)
+- [Prerequisites](#prerequisites)
 - [Installation](#installation)
 - [Usage](#usage)
   - [Examples](#examples)
 - [Contributing](#contributing)
 
-## Dependencies
+## Prerequisites
 
-> [!IMPORTANT]
-> For the program to work, you need two essential things: a webdriver and a media player.
->
-> You also need [cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html) to build the project.
+For the program to work, you need two essential components: a webdriver and a media player.
 
-By default, vizer-cli uses [chromedriver](https://developer.chrome.com/docs/chromedriver) and [vlc](https://www.videolan.org/vlc/), but you can also use [geckodriver](https://github.com/mozilla/geckodriver/releases) and [mpv](https://mpv.io/) as an alternative.
+For the webdriver, you can choose between:
 
-You can install the dependencies on Arch Linux using the following command.
+- [geckodriver](https://github.com/mozilla/geckodriver)
+- [chromedriver](https://developer.chrome.com/docs/chromedriver)
+
+For the media player, you can choose between:
+
+- [vlc](https://www.videolan.org/vlc/)
+- [mpv](https://mpv.io/)
+
+> By default, the program uses chromedriver and vlc.
+
+<details><summary>Installation on Arch Linux</summary>
+Here are the commands to install all the prerequisites:
 
 ```sh
+# To install the default
 yay -S chromedriver vlc
 ```
+
+```sh
+# To install the alternatives
+yay -S geckodriver mpv
+```
+
+You can also install the Chromium package instead of the chromedriver package because recent versions of Chromium come with chromedriver.
+
+```sh
+sudo pacman -S chromium
+```
+
+</details>
+
+<details><summary>Installation on Windows</summary>
+Here are the links to install all the prerequisites:
+<ul>
+  <li>chromedriver: https://developer.chrome.com/docs/chromedriver/downloads</li>
+  <li>geckodriver: https://github.com/mozilla/geckodriver/releases</li>
+  <li>vlc: https://www.videolan.org/vlc/download-windows.html</li>
+  <li>vlc: mpv: https://mpv.io/installation/</li>
+</ul>
+
+<b>Make sure all programs are in your PATH!</b>
+
+</details>
 
 To use the image-preview feature, you need to have [ueberzug](https://github.com/ueber-devel/ueberzug) installed, but you can also use [ueberzugpp](https://github.com/jstkdng/ueberzugpp) if you create an alias with the following command.
 
@@ -44,9 +80,6 @@ alias ueberzug='ueberzugpp'
 
 > [!WARNING]
 > Ueberzug doesn't support Windows, so you need something like WSL to use the image-preview feature.
-
-> [!TIP]
-> If you have Chromium installed, you don't need to install chromedriver because it's already installed
 
 ## Installation
 
