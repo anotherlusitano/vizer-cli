@@ -1,6 +1,7 @@
 [package]
 name = "vizer-cli"
 version = "0.3.0"
+description = "A cli tool to watch movies, series and animes in Portuguese"
 edition = "2021"
 authors = ["João Ribeiro"]
 license = "GPL-3.0"

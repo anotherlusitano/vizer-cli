@@ -1,5 +1,5 @@
 <h3 align="center">
-Uma ferramenta no terminal que te deixa assistir filmes/series/animes em português. Esta ferramenta faz scraping do site <a href="https://vizertv.in">vizertv</a>
+Uma ferramenta no terminal que te deixa assistir filmes, series e animes em português. Esta ferramenta faz scraping do site <a href="https://vizertv.in">vizertv</a>
     <p>
         <b>Português</b> |
         <a href="https://github.com/anotherlusitano/vizer-cli/blob/main/README.md">English</a>

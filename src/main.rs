@@ -29,7 +29,7 @@ static USE_GECKODRIVER: OnceLock<bool> = OnceLock::new();
 #[tokio::main]
 async fn main() {
     let matches = Command::new("vizer-cli")
-        .about("CLI tool to watch movies/series/animes in portuguese")
+        .about("A cli tool to watch movies, series and animes in Portuguese")
         .version(env!("CARGO_PKG_VERSION"))
         .subcommand_required(true)
         .arg_required_else_help(true)
