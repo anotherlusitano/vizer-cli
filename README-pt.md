@@ -11,7 +11,7 @@ Uma ferramenta no terminal que te deixa assistir filmes/series/animes em portugu
  Demonstração
 </h1>
 
-[vizer-cli](https://github.com/anotherlusitano/vizer-cli/assets/108989500/9e4d75a4-7f92-4cb2-acf0-73c3f7d7d93d)
+[vizer-cli](https://github.com/user-attachments/assets/6ef85494-1937-4ee3-bc40-a3e656c6ec38)
 
 ## Tabela de conteúdos
 
