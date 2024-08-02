@@ -1,6 +1,6 @@
 [package]
 name = "vizer-cli"
-version = "0.3.0"
+version = "1.0.0"
 description = "A cli tool to watch movies, series and animes in Portuguese"
 repository = "https://github.com/anotherlusitano/vizer-cli"
 edition = "2021"
