@@ -42,6 +42,9 @@ To use the image-preview feature, you need to have [ueberzug](https://github.com
 alias ueberzug='ueberzugpp'
 ```
 
+> [!WARNING]
+> Ueberzug doesn't support Windows, so you need something like WSL to use the image-preview feature.
+
 > [!TIP]
 > If you have Chromium installed, you don't need to install chromedriver because it's already installed
 

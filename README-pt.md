@@ -42,6 +42,9 @@ Para usar a funcionalidade de image-preview, precisas de ter o programa [ueberzu
 alias ueberzug='ueberzugpp'
 ```
 
+> [!WARNING]
+> Ueberzug não suporta o Windows, então precisas de instalar algo como o WSL para utilizar a funcionalidade de image-preview.
+
 > [!TIP]
 > Se já tiveres o Chromium instalado, não precisas de instalar o chromedriver porque ele já vem instalado.
 
