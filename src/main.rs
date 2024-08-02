@@ -159,12 +159,16 @@ async fn main() {
             match choose_media(medias, img_mode, posters_path) {
                 Ok(media) => {
                     watch_media(media, img_mode).await.unwrap();
-                    remove_temp_dir();
+                    if img_mode {
+                        remove_temp_dir();
+                    }
                 }
                 Err(err) => {
                     eprintln!("{:?}", err);
 
-                    remove_temp_dir();
+                    if img_mode {
+                        remove_temp_dir();
+                    }
                 }
             }
         }
