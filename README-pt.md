@@ -83,15 +83,22 @@ alias ueberzug='ueberzugpp'
 
 ## Instalação
 
-Por agora, a única forma de instalar é a compilar pela fonte.
+Entra na [página de lançamentos](https://github.com/anotherlusitano/vizer-cli/releases/tag/v1.0.0) e descarrega o executável. Depois disso, podes executar o executável no terminal com o seguinte comando.
 
 ```sh
-git clone https://github.com/anotherlusitano/vizer-cli.git
-cd vizer-cli/
-cargo build --release
+# Para o Linux precisas de primeiro dar permissão de escrita
+chmod +x vizer-cli
+./vizer-cli
+
+# Windows
+.\vizer-cli
 ```
 
-Depois disso, vais ter o executável do programa em `./target/release/`
+Também podes usar o `cargo` para instala-lo.
+
+```sh
+cargo install vizer-cli
+```
 
 ## Como usar
 
