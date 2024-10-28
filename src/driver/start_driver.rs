@@ -26,7 +26,7 @@ pub async fn get_driver() -> Client {
         caps.insert("moz:firefoxOptions".to_string(), opts);
         ClientBuilder::native()
             .capabilities(caps)
-            .connect("http://localhost:4444")
+            .connect("http://localhost:9515")
             .await
             .expect("failed to connect to WebDriver")
     } else {
@@ -57,6 +57,7 @@ pub fn start_browser_driver() -> Child {
     let browser_driver = Command::new(driver_command)
         .stdout(Stdio::null())
         .stderr(Stdio::null())
+        .arg("--port=9515")
         .spawn()
         .unwrap();
 
