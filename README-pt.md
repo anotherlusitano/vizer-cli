@@ -1,3 +1,6 @@
+> [!WARNING]
+> O projeto está arquivado porque o site que ele usava para scraping está fora do ar, e decidi arquivar este projeto para me focar em outros projetos que estou a trabalhar.
+
 <h3 align="center">
 Uma ferramenta no terminal que te deixa assistir filmes, series e animes em português. Esta ferramenta faz scraping do site <a href="https://vizertv.in">vizertv</a>
 </h3>

@@ -1,3 +1,6 @@
+> [!WARNING]
+> The project is archived because the website it relied on for scraping is currently offline, and I’m archiving it to focus on other projects I’m working on.
+
 <h3 align="center">
 A cli tool to watch movies, series and animes in Portuguese. This tool scrapes the site <a href="https://vizertv.in">vizertv</a>
 </h3>
